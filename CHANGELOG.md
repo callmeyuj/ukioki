@@ -11,7 +11,7 @@
 **目录结构：**
 - 创建 `ukioki/` 品牌官网根目录
 - 创建 `calories/` 子目录，包含热量计算器（从 Pet_Calories_Cal 迁移，V3.22）
-- 创建 `subscription/` 子目录（空骨架，待开发）
+- 创建 `plan/` 子目录（空骨架，待开发）
 
 **文档体系：**
 - 根目录 `CLAUDE.md`：品牌级概览（模块列表、版本、环境）
@@ -26,7 +26,7 @@
 
 **模块状态：**
 - 热量计算器（calories/）：V3.22（已上线，运行于 calories.ukioki.com）
-- 订阅计划（subscription/）：待开发
+- 订阅计划（plan/）：待开发
 
 ---
 
@@ -35,6 +35,6 @@
 | 模块 | 当前版本 | 最后更新 | CHANGELOG 位置 |
 |------|----------|----------|----------------|
 | 热量计算器 | V3.22 | 2026/09/01 | `calories/CHANGELOG.md` |
-| 订阅计划 | — | — | `subscription/CHANGELOG.md`（待创建） |
+| 订阅计划 | — | — | `plan/CHANGELOG.md`（待创建） |
 
 ---
