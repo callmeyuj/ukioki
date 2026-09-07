@@ -27,9 +27,12 @@
 
 ```
 ukioki/
+├── shared/                # 共享品牌资源
+│   ├── brand.css          # 品牌变量、基础重置、容器样式
+│   └── components.css     # 公共组件（按钮、卡片、输入框、Toast）
 ├── calories/              # 热量计算器模块
 │   ├── index.html         # 页面结构
-│   ├── style.css          # 样式
+│   ├── style.css          # 模块专属样式
 │   ├── script.js          # 逻辑
 │   ├── CLAUDE.md          # 模块专属文档
 │   ├── harness.md         # 模块迭代规范
@@ -64,7 +67,7 @@ ukioki/
 
 | Remote | 地址 | 用途 | 当前状态 |
 |--------|------|------|----------|
-| `ukioki` | `git@github.com:callmeyuj/ukioki.git` | 品牌官网（www.ukioki.com） | V1.0（初始化） |
+| `ukioki` | `git@github.com:callmeyuj/ukioki.git` | 品牌官网（www.ukioki.com） | V1.1（CSS 架构重构） |
 
 **部署**：腾讯云托管，域名 `www.ukioki.com` 已备案
 
@@ -72,7 +75,7 @@ ukioki/
 
 ## 当前版本
 
-**V1.0** — 2026/09/07（Monorepo 初始化，包含热量计算器 V3.22）
+**V1.1** — 2026/09/07（CSS 架构重构：提取共享品牌资源到 shared/）
 
 ---
 
@@ -97,6 +100,57 @@ ukioki/
 - 订阅分配方案（口味组合）
 - 价格计算
 - 订阅管理
+
+---
+
+## 共享 CSS 架构（V1.1 新增）
+
+### 架构设计
+
+采用**方案 C（混合架构）**：共享品牌资源 + 模块专属样式
+
+```
+shared/brand.css        ← 品牌变量、基础重置、容器
+shared/components.css   ← 公共组件（按钮、卡片、输入框、Toast）
+calories/style.css      ← 热量计算器专属样式
+plan/style.css          ← 订阅计划专属样式（待开发）
+```
+
+### shared/brand.css（品牌基础）
+
+包含：
+- CSS 变量（品牌色、背景、边框、文字、渐变、过渡）
+- 基础重置（*, body）
+- 容器样式（.container）
+
+### shared/components.css（公共组件）
+
+包含：
+- 按钮系统（.btn, .btn-back, .btn-next, .btn-restart）
+- 选项卡片（.option-btn 及子元素）
+- 输入框（.input, .weight-input）
+- Toast 提示（.toast）
+
+### 使用方式
+
+各模块在 `index.html` 中按顺序引用：
+```html
+<link rel="stylesheet" href="../shared/brand.css">
+<link rel="stylesheet" href="../shared/components.css">
+<link rel="stylesheet" href="style.css">
+```
+
+**CSS 优先级规则**：
+- 共享样式提供默认样式
+- 模块专属样式可覆盖共享样式（使用更具体的选择器）
+- 加载顺序：brand.css → components.css → style.css
+
+### 优势
+
+- ✅ **品牌一致性**：所有模块共享品牌变量和基础样式
+- ✅ **代码复用**：公共组件无需重复编写
+- ✅ **易于维护**：品牌升级只需修改 shared/ 目录
+- ✅ **模块独立**：各模块可灵活覆盖共享样式
 
 ---
 
@@ -164,5 +218,6 @@ ukioki/
 
 | 时间 | 内容 |
 |------|------|
+| 2026/09/07 | V1.1 CSS 架构重构（方案 C）：创建 shared/ 目录，提取品牌变量和公共组件，重构 calories/style.css |
 | 2026/09/07 | 更新整体规划（Roadmap）：订阅计划（P0）、官网主页（P1）、用户登录（P2）、小程序集成（P3）、食谱功能（P4） |
 | 2026/09/07 | V1.0 Monorepo 初始化，创建 ukioki 品牌官网结构，包含热量计算器（V3.22） |
