@@ -36,7 +36,6 @@ ukioki/
 │   ├── style.css          # 模块专属样式
 │   ├── script.js          # 逻辑
 │   ├── CLAUDE.md          # 模块专属文档
-│   ├── harness.md         # 模块迭代规范
 │   └── CHANGELOG.md       # 模块版本记录
 ├── plan/                  # 订阅计划模块（待开发）
 │   └── (空)
@@ -233,6 +232,7 @@ plan/style.css          ← 订阅计划专属样式（待开发）
 
 | 时间 | 内容 |
 |------|------|
+| 2026/09/08 | 文档架构调整：删除 calories/harness.md（迭代规范统一到品牌级），根 harness.md 吸收背景前言并修正第十二条（模块标配 = CLAUDE.md + CHANGELOG.md）；纯文档变更，版本保持 V1.2 |
 | 2026/09/08 | V1.2 共享 JS 工具提取：创建 shared/utils.js（5 个函数），calories/script.js 精简（774→758 行），测试通过（7 断言 + 手动全流程）；补打历史 tag（v1.0/v1.1/calories-v3.22） |
 | 2026/09/07 | **会话结束总结**：完成 V1.1 CSS 架构重构，测试通过，待办：提取共享 JS 工具函数 |
 | 2026/09/07 | V1.1 CSS 架构重构（方案 C）：创建 shared/ 目录，提取品牌变量和公共组件，重构 calories/style.css（1141→872 行，-24%） |

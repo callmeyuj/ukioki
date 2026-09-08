@@ -1,6 +1,8 @@
 # uki oki 品牌官网 — 迭代行为规范
 
-> 本文档是 ukioki monorepo 的迭代行为守则，适用于所有模块（calories/、subscription/ 等）。
+> 本文档是 ukioki monorepo 的**唯一**迭代行为守则，适用于所有模块（calories/、plan/ 等），模块内不再单独维护 harness.md。
+>
+> 背景：我不是程序员，对于代码无法直接理解，需要 claude 帮助产出代码。这个文档是给到 claude 后续迭代修改的行为手册，设定了安全边界。以下规则会弹性修改，酌情增删，时常调整与更新。
 
 ---
 
@@ -185,14 +187,16 @@
 
 ### 模块间隔离
 - 每个模块（calories/、plan/）独立运行，不依赖其他模块的代码
-- 模块内有自己的 `CLAUDE.md`、`harness.md`、`CHANGELOG.md`
+- 模块标配文档：`CLAUDE.md`（模块快照）+ `CHANGELOG.md`（模块版本史）
+- 迭代规范统一在品牌级（本文件），模块不单独维护 harness.md
 - 模块的文档和代码自包含，便于单独维护
 
-### 共享资源（未来可扩展）
-如果需要共享品牌资源（CSS 变量、字体、图标等），可以：
-1. 在根目录创建 `shared/` 目录
+### 共享资源（shared/）
+共享品牌资源已建立在 `shared/` 目录（V1.1 CSS、V1.2 JS）：
+1. `brand.css` / `components.css` / `utils.js`
 2. 各模块通过相对路径引用
 3. 修改共享资源需评估所有模块的兼容性
+4. `shared/` 是资源目录而非功能模块，不配置模块级文档（根 CLAUDE.md「共享资源架构」章节统一说明）
 
 ---
 
