@@ -30,6 +30,7 @@
 
 外部依赖：
 - `html2canvas` (v1.4.1) — 快照截图功能，通过 CDN 引入
+- `../shared/utils.js` — 共享工具函数（roundToHalf / formatPacks / isMobile / toggleSelection / debounce），品牌 V1.2 起引入，需在 script.js 之前加载
 
 ---
 
@@ -107,23 +108,24 @@ Step 0: 宠物类型 → Step 1: 体重 → Step 2: 性别 → Step 3: 绝育
 
 | 模块 | 行号范围 | 关键函数/常量 |
 |------|----------|---------------|
-| 常量配置 | 1-11 | `PET_CONFIG`, `POST_SURGERY_OPTIONS` |
-| 步骤配置 | 13-118 | `STEP_CONFIGS`（步骤 4-8 配置） |
-| 产品数据 | 120-138 | `PRODUCT_DATA`, `CALORIE_DEFICIT_RATIO` |
-| 状态管理 | 140-149 | `INITIAL_STATE`, `state`, `currentStep`, `currentMER` |
-| DOM 缓存 | 151-171 | `dom`, `cacheElements()` |
-| 工具函数 | 173-193 | `getPetConfig()`, `roundToHalf()`, `formatPacks()`, `isMobile()`, `toggleSelection()` |
-| 图片处理 | 195-253 | `convertImagesToBase64()`, `captureSnapshot()`, `downloadImage()`, `showImagePreview()`, `showPreviewFallback()` |
-| 规则工厂 | 255-267 | `createPostSurgeryRule()` |
-| 系数规则链 | 269-358 | `COEFFICIENT_RULES`（犬 5 条 / 猫 6 条） |
-| 流程控制 | 360-385 | `getStepFlow()`, `getStepKey()`, `navigateStep()` |
-| UI 渲染 | 387-478 | `renderStepOptions()`, `buildProgressBar()`, `updateProgress()`, `showStep()`, `configureStep()`, `restoreSelection()` |
-| 业务逻辑 | 480-546 | `calculateCoefficient()`, `showResult()`, `renderBrandSuggestions()`, `updateSnapshotData()` |
-| 事件处理 | 548-604 | `selectPet()`, `onWeightInput()`, `selectOption()`, `restart()`, `goToFeedingPage()`, `onCustomCalorieInput()` |
-| 分享逻辑 | 606-646 | `handleShare()` |
-| Toast | 648-654 | `showToast()` |
-| 初始化 | 656-697 | `initDynamicSteps()`, `initFireflies()` |
-| 事件绑定 | 699-774 | 内容区事件委托、输入监听、展开/收起动画、图片预览 |
+| 常量配置 | 1-12 | `PET_CONFIG`, `POST_SURGERY_OPTIONS` |
+| 步骤配置 | 13-119 | `STEP_CONFIGS`（步骤 4-8 配置） |
+| 产品数据 | 120-140 | `PRODUCT_DATA`, `CALORIE_DEFICIT_RATIO` |
+| 状态管理 | 141-151 | `INITIAL_STATE`, `state`, `currentStep`, `currentMER` |
+| DOM 缓存 | 152-173 | `dom`, `cacheElements()` |
+| 工具函数 | 174-178 | `getPetConfig()`（通用工具已提取至 `../shared/utils.js`） |
+| 图片处理 | 179-238 | `convertImagesToBase64()`, `captureSnapshot()`, `downloadImage()`, `showImagePreview()`, `showPreviewFallback()` |
+| 规则工厂 | 239-252 | `createPostSurgeryRule()` |
+| 系数规则链 | 253-343 | `COEFFICIENT_RULES`（犬 5 条 / 猫 6 条） |
+| 流程控制 | 344-370 | `getStepFlow()`, `getStepKey()`, `navigateStep()` |
+| UI 渲染 | 371-463 | `renderStepOptions()`, `buildProgressBar()`, `updateProgress()`, `showStep()`, `configureStep()`, `restoreSelection()` |
+| 业务逻辑 | 464-531 | `calculateCoefficient()`, `showResult()`, `renderBrandSuggestions()`, `updateSnapshotData()` |
+| 事件处理 | 532-589 | `selectPet()`, `onWeightInput()`, `selectOption()`, `restart()`, `goToFeedingPage()`, `onCustomCalorieInput()` |
+| 分享逻辑 | 590-631 | `handleShare()` |
+| Toast | 632-639 | `showToast()` |
+| 初始化工具函数 | 640-677 | `initDynamicSteps()`, `initFireflies()` |
+| 初始化 | 678-682 | 顶层调用（initDynamicSteps / initFireflies / cacheElements） |
+| 事件绑定 | 683-758 | 内容区事件委托、输入监听、展开/收起动画、图片预览 |
 
 ### style.css 模块
 
@@ -171,7 +173,7 @@ let state = {
 
 | 函数 | 作用 | 文件 |
 |------|------|------|
-| `toggleSelection()` | 通用选中切换（pet-card / option-btn 复用） | script.js |
+| `toggleSelection()` | 通用选中切换（pet-card / option-btn 复用） | shared/utils.js |
 | `navigateStep(offset)` | 统一的前进/后退导航 | script.js |
 | `handleShare()` | 分享逻辑：生成图片 → Web Share / 预览回退 | script.js |
 | `showPreviewFallback()` | 不支持 Web Share 时显示图片预览 | script.js |
@@ -315,6 +317,7 @@ git push origin main && git push test-repo main
 
 | 时间 | 内容 |
 |------|------|
+| 2026/09/08 | 品牌 V1.2：通用工具函数（roundToHalf/formatPacks/isMobile/toggleSelection）提取至 shared/utils.js，script.js 774→758 行，调用点零改动，模块版本保持 V3.22 |
 | 2026/09/01 | V3.22 热量缺口从 0.9 调整为 0.85（犬猫通用，影响建议表及自定义热量输入） |
 | 2026/08/31 | V3.21 犬类产品数据更新（新增鸭肉冬瓜梨、改名、更新平均值）+ 文档规范整理 + 文件清理 |
 | 2026/08/31 | 本地回退至 V3.2（origin 同步），V3.3 代码已退回，仅保留记录 |

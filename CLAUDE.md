@@ -29,7 +29,8 @@
 ukioki/
 ├── shared/                # 共享品牌资源
 │   ├── brand.css          # 品牌变量、基础重置、容器样式
-│   └── components.css     # 公共组件（按钮、卡片、输入框、Toast）
+│   ├── components.css     # 公共组件（按钮、卡片、输入框、Toast）
+│   └── utils.js           # 共享工具函数（数值、环境判断、DOM、防抖）
 ├── calories/              # 热量计算器模块
 │   ├── index.html         # 页面结构
 │   ├── style.css          # 模块专属样式
@@ -61,13 +62,13 @@ ukioki/
 - **本地服务器**：`http-server -p 8080 -c-1`（Node.js，禁用缓存）
 - **访问地址**：
   - 热量计算器：`http://localhost:8080/calories/`
-  - 订阅计划：`http://localhost:8080/subscription/`（待开发）
+  - 订阅计划：`http://localhost:8080/plan/`（待开发）
 
 ### Git Remote
 
 | Remote | 地址 | 用途 | 当前状态 |
 |--------|------|------|----------|
-| `ukioki` | `git@github.com:callmeyuj/ukioki.git` | 品牌官网（www.ukioki.com） | V1.1（CSS 架构重构） |
+| `ukioki` | `git@github.com:callmeyuj/ukioki.git` | 品牌官网（www.ukioki.com） | V1.2（共享 JS 工具提取） |
 
 **部署**：腾讯云托管，域名 `www.ukioki.com` 已备案
 
@@ -75,7 +76,7 @@ ukioki/
 
 ## 当前版本
 
-**V1.1** — 2026/09/07（CSS 架构重构：提取共享品牌资源到 shared/）
+**V1.2** — 2026/09/08（共享 JS 工具提取：创建 shared/utils.js）
 
 ---
 
@@ -103,16 +104,18 @@ ukioki/
 
 ---
 
-## 共享 CSS 架构（V1.1 新增）
+## 共享资源架构（V1.1 新增，V1.2 扩展 JS）
 
 ### 架构设计
 
-采用**方案 C（混合架构）**：共享品牌资源 + 模块专属样式
+采用**方案 C（混合架构）**：共享品牌资源 + 模块专属样式/逻辑
 
 ```
 shared/brand.css        ← 品牌变量、基础重置、容器
 shared/components.css   ← 公共组件（按钮、卡片、输入框、Toast）
+shared/utils.js         ← 共享工具函数（V1.2 新增）
 calories/style.css      ← 热量计算器专属样式
+calories/script.js      ← 热量计算器专属逻辑
 plan/style.css          ← 订阅计划专属样式（待开发）
 ```
 
@@ -145,10 +148,27 @@ plan/style.css          ← 订阅计划专属样式（待开发）
 - 模块专属样式可覆盖共享样式（使用更具体的选择器）
 - 加载顺序：brand.css → components.css → style.css
 
+### shared/utils.js（共享工具函数，V1.2 新增）
+
+包含：
+- 数值处理：`roundToHalf()`（取整到 0.5）、`formatPacks()`（包数格式化）
+- 环境判断：`isMobile()`（UA 判断移动设备）
+- DOM 工具：`toggleSelection()`（选项卡片选中切换）
+- 函数控制：`debounce()`（防抖，为 plan/ 输入场景备用）
+
+**JS 加载方式**（普通 script + defer，无构建工具）：
+```html
+<script src="../shared/utils.js" defer></script>
+<script src="script.js" defer></script>
+```
+- defer 保证按顺序执行：utils.js 先于模块 script.js
+- 函数为全局函数，模块内直接调用（函数名不冲突即可）
+- 提取原则：仅提取**不依赖模块内部状态**的通用函数（如 `getPetConfig()` 依赖 calories 的 state，不提取）
+
 ### 优势
 
 - ✅ **品牌一致性**：所有模块共享品牌变量和基础样式
-- ✅ **代码复用**：公共组件无需重复编写
+- ✅ **代码复用**：公共组件和工具函数无需重复编写
 - ✅ **易于维护**：品牌升级只需修改 shared/ 目录
 - ✅ **模块独立**：各模块可灵活覆盖共享样式
 
@@ -182,34 +202,27 @@ plan/style.css          ← 订阅计划专属样式（待开发）
 
 ## 待办功能
 
-### 1. 提取共享 JS 工具函数（P0 - 下次优先）
-- 范围：创建 `shared/utils.js`，提取通用工具函数
-- 提取内容：`roundToHalf()`, `formatPacks()`, `isMobile()`, `debounce()` 等
-- 更新：`calories/script.js` 改为导入共享工具
-- 预计工作量：30-60 分钟
-- 状态：**待实现**
-
-### 2. 订阅计划模块开发（P1）
+### 1. 订阅计划模块开发（P0 - 下次优先）
 - 范围：新建 plan/ 模块
 - 功能：订阅分配、口味组合、价格计算
 - 状态：**待开发**
 
-### 3. 官网主页（P2）
+### 2. 官网主页（P1）
 - 范围：根目录 index.html
 - 功能：品牌展示 + 各模块入口导航
 - 状态：**待规划**
 
-### 4. 用户登录系统（P3）
+### 3. 用户登录系统（P2）
 - 范围：shared/ 或独立模块
 - 功能：微信登录、手机号登录、用户数据管理
 - 状态：**待规划**
 
-### 5. 微信小程序集成（P4）
+### 4. 微信小程序集成（P3）
 - 范围：跨平台登录态同步
 - 方案：UnionID 机制 或 手机号关联
 - 状态：**待评估**
 
-### 6. 食谱配方功能（P5）
+### 5. 食谱配方功能（P4）
 - 范围：待定
 - 功能：待定
 - 状态：**待定**
@@ -220,6 +233,7 @@ plan/style.css          ← 订阅计划专属样式（待开发）
 
 | 时间 | 内容 |
 |------|------|
+| 2026/09/08 | V1.2 共享 JS 工具提取：创建 shared/utils.js（5 个函数），calories/script.js 精简（774→758 行），测试通过（7 断言 + 手动全流程）；补打历史 tag（v1.0/v1.1/calories-v3.22） |
 | 2026/09/07 | **会话结束总结**：完成 V1.1 CSS 架构重构，测试通过，待办：提取共享 JS 工具函数 |
 | 2026/09/07 | V1.1 CSS 架构重构（方案 C）：创建 shared/ 目录，提取品牌变量和公共组件，重构 calories/style.css（1141→872 行，-24%） |
 | 2026/09/07 | 更新整体规划（Roadmap）：订阅计划（P0）、官网主页（P1）、用户登录（P2）、小程序集成（P3）、食谱功能（P4） |

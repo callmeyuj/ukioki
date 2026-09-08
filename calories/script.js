@@ -172,26 +172,9 @@ function cacheElements() {
 }
 
 // ========== 工具函数 ==========
+// 通用工具函数（roundToHalf / formatPacks / isMobile / toggleSelection / debounce）
+// 已提取至 ../shared/utils.js，本文件直接调用
 const getPetConfig = () => PET_CONFIG[state.petType];
-
-function roundToHalf(value) {
-    return Math.round(value * 2) / 2;
-}
-
-function formatPacks(packs) {
-    return Number.isInteger(packs) ? packs.toString() : packs.toFixed(1);
-}
-
-function isMobile() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-// 通用选中切换
-function toggleSelection(container, selector, value) {
-    container.querySelectorAll(selector).forEach(el => el.classList.remove('selected'));
-    const target = container.querySelector(`${selector}[data-value="${value}"]`);
-    if (target) target.classList.add('selected');
-}
 
 // ========== 图片处理（分享功能）==========
 async function convertImagesToBase64(container) {

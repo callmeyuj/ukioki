@@ -4,6 +4,45 @@
 
 ---
 
+## V1.2 — 2026/09/08
+
+### 共享 JS 工具提取（V1.1 CSS 提取的 JS 侧对应操作）
+
+**新增 shared/utils.js（43 行）：**
+- 数值处理：`roundToHalf()`（取整到 0.5）、`formatPacks()`（包数格式化）
+- 环境判断：`isMobile()`（UA 判断移动设备）
+- DOM 工具：`toggleSelection()`（选项卡片选中切换）
+- 函数控制：`debounce()`（**新增备用**，原代码中不存在，为 plan/ 输入场景准备）
+
+**重构 calories/script.js：**
+- 从 774 行精简至 758 行（-16 行）
+- 删除已提取到 shared/utils.js 的 4 个函数定义
+- 保留 `getPetConfig()`（依赖模块内部 state，不符合提取原则）
+- 所有调用点零改动（函数名不变，全局函数直接可用）
+
+**更新 calories/index.html：**
+- 添加 `<script src="../shared/utils.js" defer>` 引用（先于 script.js，defer 保证执行顺序）
+
+**技术方案：**
+- 普通 script 标签 + 全局函数，与现有无构建工具架构一致
+- 不引入 ES Module / 打包工具，保持纯前端零依赖
+
+**提取原则（沿用 CSS 方案 C 思路）：**
+- 仅提取不依赖模块内部状态的通用函数
+- 加载顺序：shared/utils.js → 模块 script.js
+
+**测试：**
+- 自动测试：7 个断言全部通过（roundToHalf x3、formatPacks x2、isMobile x1、debounce x1）
+- 手动测试：calories 全流程验证通过（选项切换、MER 计算、喂食量表、自定义热量、分享功能）
+
+**版本号说明：**
+- 沿用 V1.1 先例：共享资源提取只升品牌级版本，calories 保持 V3.22 不变
+
+**其他：**
+- 补打历史版本 tag：`v1.0`、`v1.1`、`calories-v3.22`（此前仓库无任何 tag）
+
+---
+
 ## V1.1 — 2026/09/07
 
 ### CSS 架构重构（方案 C：混合架构）
@@ -66,6 +105,6 @@
 |------|----------|----------|----------------|
 | 热量计算器 | V3.22 | 2026/09/01 | `calories/CHANGELOG.md` |
 | 订阅计划 | — | — | `plan/CHANGELOG.md`（待创建） |
-| 品牌官网 | V1.1 | 2026/09/07 | 本文件 |
+| 品牌官网 | V1.2 | 2026/09/08 | 本文件 |
 
 ---
