@@ -290,7 +290,7 @@ const STEP_CONFIGS = {
 | `origin` | `git@github.com:callmeyuj/pet-calories-calculator.git` | 生产环境，稳定版 | V3.22 |
 | `test-repo` | `git@github.com:callmeyuj/test-pet-calories-calculator.git` | 测试环境 | V3.22 |
 
-**本地状态**：V3.22（与远程同步）
+**本地状态**：V3.23（新增 from=plan 回程入口，待部署）
 
 同时推送两个 remote：
 ```bash
@@ -301,7 +301,7 @@ git push origin main && git push test-repo main
 
 ## 当前版本
 
-**V3.22** — 2026/09/01（热量缺口从 0.9 调整为 0.85）
+**V3.23** — 2026/09/21（plan/ 回程入口适配：条件隔离，正常入口零感知）
 
 ---
 
@@ -318,6 +318,7 @@ git push origin main && git push test-repo main
 
 | 时间 | 内容 |
 |------|------|
+| 2026/09/21 | **V3.23 plan/ 回程入口适配**：条件隔离（`from=plan` URL 参数），跳过 Step 0 锁定犬，Step 10 商城按钮条件替换为「↩ 返回订阅计划」，返回时带 `pet/packs/kcal` 参数跳回 plan/。正常入口零感知 |
 | 2026/09/08 | 文档架构调整：删除模块内 harness.md，迭代规范统一到品牌级根 harness.md（纯文档变更，模块版本保持 V3.22） |
 | 2026/09/08 | 品牌 V1.2：通用工具函数（roundToHalf/formatPacks/isMobile/toggleSelection）提取至 shared/utils.js，script.js 774→758 行，调用点零改动，模块版本保持 V3.22 |
 | 2026/09/01 | V3.22 热量缺口从 0.9 调整为 0.85（犬猫通用，影响建议表及自定义热量输入） |

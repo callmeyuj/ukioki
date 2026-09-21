@@ -2,6 +2,26 @@
 
 ---
 
+## V3.23 — 2026/09/21
+
+### plan/ 回程入口适配
+
+**核心原则：条件隔离，正常入口零感知**
+- 所有改动仅在 URL 含 `from=plan` 参数时生效
+- 正常入口（无参数）行为 100% 不变
+
+**script.js：**
+- 新增 `state.fromPlan` 标志（默认 `false`）
+- 新增 `initFromPlan()` IIFE：解析 URL 参数，设置 `petType`（默认犬），隐藏进度条，跳至 Step 1
+- `restart()` 适配：`fromPlan=true` 时保留 `petType=dog`，跳至 Step 1（不回到 Step 0）
+- `goToFeedingPage()` 适配：`fromPlan=true` 时隐藏商城按钮，显示「↩ 返回订阅计划」按钮
+- 返回按钮点击：跳转 `../plan/?pet=dog&packs=平均每日包数&kcal=MER×0.85`
+
+**index.html：**
+- Step 10 新增隐藏按钮 `#btnReturnPlan`（默认 `hidden`，fromPlan 模式下 JS 切换显示）
+
+---
+
 ## V3.22 — 2026/09/01
 
 ### 热量缺口调整（0.9 → 0.85）

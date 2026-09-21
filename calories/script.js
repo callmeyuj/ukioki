@@ -145,7 +145,7 @@ const INITIAL_STATE = {
     pregnant: null, postSurgery: null
 };
 
-let state = { ...INITIAL_STATE };
+let state = { ...INITIAL_STATE, fromPlan: false };
 let currentStep = 0;
 let currentMER = 0;
 
@@ -551,7 +551,8 @@ function selectOption(step, key, value) {
 }
 
 function restart() {
-    state = { ...INITIAL_STATE };
+    const wasFromPlan = state.fromPlan;
+    state = { ...INITIAL_STATE, fromPlan: wasFromPlan };
     currentMER = 0;
     dom.weightInput.value = '';
     document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
@@ -559,9 +560,14 @@ function restart() {
     dom.customCalorieInput.value = '';
     dom.customResult.innerHTML = '';
     dom.customResult.classList.remove('show');
-    dom.progressBar.style.display = '';
+    dom.progressBar.style.display = wasFromPlan ? 'none' : '';
     buildProgressBar();
-    showStep(0);
+    if (wasFromPlan) {
+        state.petType = 'dog';
+        showStep(1);
+    } else {
+        showStep(0);
+    }
 }
 
 function goToFeedingPage() {
@@ -570,6 +576,21 @@ function goToFeedingPage() {
     dom.feedingMerValue.textContent = Math.round(currentMER);
     renderBrandSuggestions();
     dom.progressBar.style.display = 'none';
+
+    // from=plan 回程：切换商城按钮 → 返回订阅计划按钮
+    const shopBtn = document.getElementById('btnShop');
+    const returnBtn = document.getElementById('btnReturnPlan');
+    if (state.fromPlan && returnBtn && shopBtn) {
+        shopBtn.style.display = 'none';
+        returnBtn.style.display = '';
+        returnBtn.onclick = () => {
+            const avgEl = document.querySelector('.average-row .col-packs');
+            const avgPacks = avgEl ? parseFloat(avgEl.textContent) : 0;
+            const kcal = Math.round(currentMER * CALORIE_DEFICIT_RATIO);
+            window.location.href = `../plan/?from=plan&pet=${state.petType}&packs=${avgPacks}&kcal=${kcal}`;
+        };
+    }
+
     showStep(10);
 }
 
@@ -700,7 +721,14 @@ document.querySelector('.content').addEventListener('click', function(e) {
     if (actionBtn) {
         const action = actionBtn.dataset.action;
         if (action === 'next') navigateStep(1);
-        else if (action === 'prev') navigateStep(-1);
+        else if (action === 'prev') {
+            // from=plan 路径：Step 1 的"上一步"变为返回订阅计划
+            if (state.fromPlan && currentStep === 1) {
+                window.location.href = '../plan/';
+            } else {
+                navigateStep(-1);
+            }
+        }
         else if (action === 'restart') restart();
         else if (action === 'share') handleShare();
     }
@@ -756,3 +784,20 @@ dom.imagePreviewModal?.addEventListener('click', (e) => {
 });
 
 buildProgressBar();
+
+// ========== from=plan 入口适配 ==========
+// 条件隔离：仅当 URL 含 from=plan 时生效，正常入口零感知
+(function initFromPlan() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('from') !== 'plan') return;
+
+    state.fromPlan = true;
+    state.petType = params.get('pet') || 'dog'; // 默认犬（V1 仅支持犬）
+    dom.progressBar.style.display = 'none';      // 跳过 Step 0，隐藏进度条
+
+    // Step 1 的"上一步"按钮改为"返回订阅计划"（::before 已有箭头图标）
+    const step1Prev = document.querySelector('#step-1 [data-action="prev"]');
+    if (step1Prev) step1Prev.textContent = '返回订阅计划';
+
+    showStep(1);                                 // 从体重输入开始
+})();

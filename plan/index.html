@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>uki oki · 个性化订阅</title>
+    <link rel="stylesheet" href="../shared/brand.css">
+    <link rel="stylesheet" href="../shared/components.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ==================== Screen 1: 基础配置 ==================== -->
+        <div class="step active" id="step-1">
+            <div class="page-header">
+                <div class="step-title">个性化订阅</div>
+                <div class="step-desc">为爱宠定制最合适的鲜食方案</div>
+            </div>
+
+            <!-- 宠物类型 -->
+            <div class="section" id="section-pet">
+                <div class="section-label">宠物类型</div>
+                <div class="pet-options" id="petOptions">
+                    <div class="pet-card selected" data-pet="dog">
+                        <div class="icon">🐶</div>
+                        <div class="label">犬</div>
+                    </div>
+                    <div class="pet-card disabled" data-pet="cat">
+                        <div class="icon">🐱</div>
+                        <div class="label">猫</div>
+                        <div class="pet-badge">敬请期待</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 订阅包数（必填） -->
+            <div class="section" id="section-packs">
+                <div class="section-label">订阅总数 <span class="required">*</span></div>
+                <div class="input-wrapper">
+                    <input type="number" class="input input-normal" id="packsInput" placeholder="30包起订，120g/包" min="30" step="1" inputmode="numeric">
+                    <span class="input-suffix">包</span>
+                </div>
+                <div class="hint-error" id="packsHint">起订门槛 30 包</div>
+            </div>
+
+            <!-- 免邮信息 -->
+            <div class="shipping-info" id="shippingInfo">
+                <span>📦 单次配送满30包免邮</span>
+                <span>当前免邮次数：<strong id="freeDeliveryCount">0</strong> 次</span>
+            </div>
+
+            <!-- 模拟计算（可折叠） -->
+            <div class="section" id="section-simulate">
+                <div class="section-label section-collapse" id="simulateToggle">
+                    包数计算 <span class="section-hint">（辅助估算订阅总数，展开使用）</span>
+                    <span class="collapse-icon"></span>
+                </div>
+                <div class="section-body" id="simulateBody">
+                    <div class="simulate-row">
+                        <div class="simulate-label">每日包数(120g/包)</div>
+                        <div class="simulate-input-row">
+                            <input type="number" class="input input-sm" id="dailyPacksInput" placeholder="不知道？先去算热量~" min="0" step="0.5" inputmode="decimal">
+                            <button class="btn-link" id="goCaloriesBtn">热量计算器 →</button>
+                        </div>
+                    </div>
+
+                    <div class="simulate-row">
+                        <div class="simulate-label">订阅天数</div>
+                        <div class="day-options" id="dayOptions">
+                            <div class="day-btn" data-days="30">30 天</div>
+                            <div class="day-btn" data-days="90">90 天</div>
+                            <div class="day-btn" data-days="180">180 天</div>
+                            <div class="day-btn custom" data-days="0">自定义</div>
+                        </div>
+                        <input type="number" class="input input-sm hidden" id="customDaysInput" placeholder="输入天数" min="1" step="1" inputmode="numeric">
+                    </div>
+
+                    <div class="simulate-row">
+                        <div class="simulate-label">估算包数</div>
+                        <div class="simulate-inline">
+                            <span class="simulate-inline-value" id="simulatedPacksValue">-- 包</span>
+                            <button class="btn-link" id="adoptSimBtn" disabled>使用此数据 → </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-next" id="btnNext1" disabled>口味分配</button>
+            </div>
+        </div>
+
+        <!-- ==================== Screen 2: 口味分配 ==================== -->
+        <div class="step" id="step-2">
+            <div class="step-header">
+                <button class="btn-back-link" id="btnBack2">&lt;</button>
+                <div class="step-title">分配口味</div>
+            </div>
+
+            <div class="allocation-toolbar">
+                <div class="allocation-summary">
+                    <span class="allocation-count" id="allocationCount">
+                        已分配：<span id="allocatedCount">0</span> / <span id="totalCount">0</span> 包
+                    </span>
+                    <span class="allocation-hint" id="allocationHint"></span>
+                </div>
+                <div class="quick-actions" id="quickActions">
+                    <button class="btn-link" id="btnEvenSplit">平均分配</button>
+                    <button class="btn-link" id="btnClearAll">重新分配</button>
+                </div>
+            </div>
+
+            <div class="flavor-list" id="flavorList">
+                <!-- 由 JS 动态生成 -->
+            </div>
+
+            <div class="price-panel">
+                <div class="price-row">
+                    <span class="price-original" id="priceOriginal">¥ 0.00</span>
+                </div>
+                <div class="price-row">
+                    <span class="price-current">💰 参考预算</span>
+                    <div class="price-current-right">
+                        <span class="price-value" id="priceValue">¥ 0.00</span>
+                        <span class="price-rate" id="priceRate"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 热量矫正提示（仅回程路径显示） -->
+            <div class="calorie-deviation hidden" id="calorieDeviation">
+                <div class="deviation-text" id="deviationText"></div>
+                <div class="deviation-link">→ 可返回上一步调整每日包数</div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-next" id="btnNext2" disabled>方案结果</button>
+            </div>
+        </div>
+
+        <!-- ==================== Screen 3: 方案结果 ==================== -->
+        <div class="step" id="step-3">
+            <div class="step-header">
+                <button class="btn-back-link" id="btnBack3">&lt;</button>
+                <div class="step-title">方案结果</div>
+            </div>
+
+            <!-- 快照卡片（Screen 3 可见版） -->
+            <div class="snapshot-preview" id="snapshotPreview">
+                <div class="snapshot-header">
+                    <div class="snapshot-brand">
+                        <div class="snapshot-brand-name">uki oki · 订阅方案</div>
+                        <div class="snapshot-brand-slogan">科学定制，鲜食到家</div>
+                    </div>
+                    <div class="snapshot-qr">
+                        <img src="image/qrcode-service.png" alt="企微客服" class="snapshot-qr-img" crossorigin="anonymous">
+                        <div class="snapshot-qr-hint">企微客服</div>
+                    </div>
+                </div>
+                <div class="snapshot-section">
+                    <div class="snapshot-section-title">── 方案明细 ──</div>
+                    <div class="snapshot-field"><span>宠物</span><span id="snapPet">犬</span></div>
+                    <div class="snapshot-field"><span>配送日期</span><span id="snapDeliveryCycle">按需通知客服</span></div>
+                    <div class="snapshot-field"><span>订阅总数</span><span class="text-bold" id="snapPacks">--</span></div>
+                    <div id="snapFlavorList"></div>
+                </div>
+                <div class="snapshot-section snapshot-price-section">
+                    <div class="snapshot-field"><span class="text-strike" id="snapOriginalPrice">¥ 0.00</span></div>
+                    <div class="snapshot-field snapshot-total">
+                        <span>折后总价 <span class="snap-discount-tag" id="snapDiscount"></span></span>
+                        <span class="text-price" id="snapTotalPrice">¥ 0.00</span>
+                    </div>
+                </div>
+                <div class="snapshot-footer">
+                    <span>📦 30包起送免邮</span>
+                    <span>·</span>
+                    <span id="snapDate">生成日期</span>
+                </div>
+            </div>
+
+            <!-- 隐藏版快照卡片（供 html2canvas 渲染） -->
+            <div class="snapshot-card" id="snapshotCard">
+                <!-- 内容由 JS 动态填充，与 visible 版结构相同 -->
+            </div>
+
+            <div class="btn-row btn-row-stack">
+                <button class="btn btn-next" id="btnSaveSnapshot">💾 快照预览（截图保存）</button>
+                <button class="btn btn-back" id="btnRestart">↺ 重新规划</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片预览弹窗 -->
+    <div class="image-preview-modal" id="imagePreviewModal">
+        <button class="image-preview-close" id="imagePreviewClose">✕</button>
+        <div class="image-preview-hint-top">请截图保存后，长按图片添加客服并分享</div>
+        <img id="imagePreviewImg" src="" alt="预览图片">
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast">已保存到相册</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="../shared/utils.js" defer></script>
+    <script src="script.js" defer></script>
+</body>
+</html>

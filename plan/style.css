@@ -1,0 +1,852 @@
+/* ========== uki oki 订阅计划 — 模块专属样式 ========== */
+
+/* ========== 通用 ========== */
+.step { display: none; }
+.step.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.hidden { display: none !important; }
+.required { color: #e74c3c; }
+.text-strike { text-decoration: line-through; color: #999; }
+.text-price { color: var(--brand-green); font-weight: 700; }
+.text-bold { font-weight: 700; }
+
+/* 页面主标题（Screen 1） */
+.page-header {
+    margin-bottom: 32px;
+}
+
+.step-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--brand-dark);
+    line-height: 1.3;
+}
+
+.step-desc {
+    font-size: 13px;
+    color: var(--text-gray);
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+/* ========== 输入框 ========== */
+/* 正常尺寸（覆盖 shared .input 的 24px + 60px 右 padding） */
+.input.input-normal {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 44px 12px 14px;
+}
+
+.input.input-normal::placeholder {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* 小尺寸（模拟区用） */
+.input.input-sm {
+    font-size: 14px;
+    padding: 8px 12px;
+    width: 100%;
+}
+
+.input.input-sm::placeholder {
+    font-size: 13px;
+    font-weight: 400;
+}
+
+/* ========== 头部 ========== */
+.step-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.step-header .step-title {
+    flex: 1;
+    text-align: center;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--brand-dark);
+}
+
+.btn-back-link {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-gray);
+    cursor: pointer;
+    padding: 6px 10px;
+    line-height: 1;
+    z-index: 1;
+}
+
+.btn-back-link:hover {
+    color: var(--brand-dark);
+}
+
+.btn-back-link:hover { color: var(--brand-dark); }
+
+/* 下一步按钮箭头（复用 calories/ 箭头图） */
+.btn-next::after {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background: url('../calories/image/next-hover-arrow.png') center/contain no-repeat;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+
+.btn-next:disabled::after {
+    background-image: url('../calories/image/next-normal-arrow.png');
+}
+
+/* ========== 区块 ========== */
+.section {
+    margin-bottom: 20px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.section:first-child,
+.page-header + .section {
+    border-top: none;
+    padding-top: 0;
+}
+
+.section-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--brand-dark);
+    margin-bottom: 14px;
+}
+
+.section-hint {
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--text-gray);
+    margin-left: 4px;
+}
+
+.hint-error {
+    font-size: 12px;
+    color: #e74c3c;
+    margin-top: 6px;
+    display: none;
+}
+
+.hint-error.show { display: block; }
+
+/* 折叠样式 */
+.section-collapse {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    padding: 4px 0;
+}
+
+.collapse-icon {
+    position: relative;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--bg-card-selected);
+    margin-left: auto;
+    padding-left: 8px;
+    flex-shrink: 0;
+}
+
+/* 横线（−），始终显示，绝对居中 */
+.collapse-icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 2px;
+    background: var(--brand-dark);
+    border-radius: 1px;
+}
+
+/* 竖线（+ 的竖笔），默认隐藏（展开态显示 −） */
+.collapse-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 12px;
+    background: var(--brand-dark);
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.section.collapsed .collapse-icon::after {
+    opacity: 1;
+}
+
+
+.section-body {
+    margin-top: 14px;
+}
+
+.section.collapsed .section-body {
+    display: none;
+}
+
+/* ========== 宠物类型 ========== */
+.pet-options {
+    display: flex;
+    gap: 12px;
+}
+
+.pet-card {
+    flex: 1;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    padding: 14px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    background: var(--bg-cream);
+}
+
+.pet-card .icon {
+    font-size: 28px;
+    margin-bottom: 4px;
+    line-height: 1;
+}
+
+.pet-card .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--brand-dark);
+}
+
+.pet-card.selected {
+    border-color: var(--brand-yellow);
+    background: var(--bg-card-selected);
+    box-shadow: 0 4px 12px rgba(224, 231, 33, 0.15);
+}
+
+.pet-card:not(.disabled):not(.selected):hover {
+    border-color: var(--brand-yellow-dark);
+    transform: translateY(-1px);
+}
+
+.pet-card.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pet-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 10px;
+    color: #555;
+    background: rgba(255,255,255,0.85);
+    padding: 2px 6px;
+    border-radius: 8px;
+}
+
+/* ========== 模拟计算 ========== */
+.simulate-row { margin-bottom: 16px; }
+
+.simulate-label {
+    font-size: 13px;
+    color: var(--brand-dark-light);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.simulate-input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.simulate-input-row .input.input-sm {
+    flex: 1;
+    min-width: 0;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    font-size: 13px;
+    color: var(--brand-green);
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.btn-link:hover { text-decoration: underline; }
+
+.day-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.day-btn {
+    flex: 1;
+    min-width: 0;
+    border: 1.5px solid var(--border-light);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 13px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--bg-cream);
+    color: var(--brand-dark);
+    font-weight: 500;
+}
+
+.day-btn:hover {
+    border-color: var(--brand-yellow-dark);
+}
+
+.day-btn.selected {
+    border-color: var(--brand-yellow);
+    background: var(--bg-card-selected);
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(224, 231, 33, 0.12);
+}
+
+.day-btn.custom {
+    font-size: 11px;
+}
+
+/* 自定义天数输入框与选项的间距 */
+.day-options + .input.input-sm:not(.hidden) {
+    margin-top: 10px;
+}
+
+/* 模拟包数 — 内联展示 */
+.simulate-inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.simulate-inline-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--brand-green);
+}
+
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* ========== 免邮信息 ========== */
+.shipping-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg-cream);
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--text-gray);
+    margin-top: 8px;
+}
+
+.shipping-info strong {
+    color: var(--brand-green);
+    font-size: 14px;
+}
+
+/* ========== 口味分配 ========== */
+.allocation-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+
+.allocation-summary {
+    flex: 1;
+    min-width: 0;
+}
+
+.allocation-count {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--brand-dark);
+}
+
+.allocation-hint {
+    font-size: 12px;
+    color: var(--text-gray);
+    margin-left: 6px;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.quick-actions .btn-link {
+    font-size: 13px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    background: var(--bg-cream);
+    border: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.quick-actions .btn-link:hover {
+    background: var(--bg-card-selected);
+    border-color: var(--brand-yellow);
+    text-decoration: none;
+}
+
+.flavor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.flavor-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--bg-cream);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+}
+
+.flavor-name {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.flavor-name-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--brand-dark);
+}
+
+.flavor-price {
+    font-size: 12px;
+    color: var(--text-gray);
+}
+
+.flavor-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.flavor-controls .btn-minus,
+.flavor-controls .btn-plus {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-light);
+    background: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: var(--brand-dark);
+    line-height: 1;
+}
+
+.flavor-controls .btn-minus:hover:not(:disabled),
+.flavor-controls .btn-plus:hover:not(:disabled) {
+    border-color: var(--brand-yellow);
+    background: var(--bg-card-selected);
+    transform: scale(1.05);
+}
+
+.flavor-controls .btn-minus:active:not(:disabled),
+.flavor-controls .btn-plus:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.flavor-controls .btn-minus:disabled,
+.flavor-controls .btn-plus:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.flavor-controls .flavor-input {
+    width: 48px;
+    text-align: center;
+    border: 1.5px solid var(--border-light);
+    border-radius: 8px;
+    padding: 5px 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--brand-dark);
+    outline: none;
+    background: #fff;
+    transition: border-color 0.2s ease;
+}
+
+.flavor-controls .flavor-input:focus {
+    border-color: var(--brand-yellow);
+    box-shadow: 0 0 0 2px rgba(224, 231, 33, 0.15);
+}
+
+/* ========== 价格面板 ========== */
+.price-panel {
+    margin-top: 20px;
+    padding: 18px 20px;
+    border: 2px dashed var(--brand-yellow);
+    border-radius: 14px;
+    background: rgba(224, 231, 33, 0.06);
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+
+.price-row:last-child { margin-bottom: 0; }
+
+.price-original {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.price-current {
+    font-size: 14px;
+    color: var(--text-gray);
+    font-weight: 500;
+}
+
+.price-current-right {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.price-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--brand-green);
+}
+
+.price-rate {
+    font-size: 13px;
+    color: var(--brand-green);
+    font-weight: 600;
+    background: rgba(74, 106, 29, 0.1);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* ========== 热量偏差提示 ========== */
+.calorie-deviation {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-left: 3px solid #f39c12;
+    background: rgba(243, 156, 18, 0.08);
+    border-radius: 0 8px 8px 0;
+}
+
+.deviation-text {
+    font-size: 13px;
+    color: var(--brand-dark);
+    margin-bottom: 4px;
+}
+
+.deviation-link {
+    font-size: 12px;
+    color: var(--brand-green);
+    cursor: pointer;
+}
+
+.deviation-link:hover { text-decoration: underline; }
+
+/* ========== 快照卡片 ========== */
+.snapshot-preview {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto 20px;
+    background: linear-gradient(180deg, #fefefe 0%, #f8f9f0 100%);
+    border-radius: 14px;
+    border: 2px solid var(--brand-yellow);
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(224, 231, 33, 0.10);
+}
+
+.snapshot-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px dashed var(--brand-yellow);
+}
+
+.snapshot-brand { flex: 1; min-width: 0; }
+
+.snapshot-brand-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--brand-dark);
+    line-height: 1.2;
+}
+
+.snapshot-brand-slogan {
+    font-size: 10px;
+    color: var(--text-gray);
+    line-height: 1.2;
+    margin-top: 1px;
+}
+
+.snapshot-qr {
+    text-align: center;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.snapshot-qr-img {
+    width: 110px;
+    height: 110px;
+    border-radius: 6px;
+    border: 1px solid var(--border-light);
+}
+
+.snapshot-qr-hint {
+    font-size: 10px;
+    color: var(--text-unit);
+    margin-top: 3px;
+}
+
+.snapshot-section {
+    padding: 10px 14px;
+    border-bottom: 1px dashed var(--brand-yellow);
+}
+
+.snapshot-section:last-of-type { border-bottom: none; }
+
+.snapshot-section-title {
+    font-size: 11px;
+    color: var(--text-gray);
+    margin-bottom: 8px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.snapshot-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 0;
+    font-size: 13px;
+    color: var(--brand-dark);
+}
+
+.snapshot-field span:first-child {
+    color: var(--text-gray);
+}
+
+.snapshot-total {
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 1px solid var(--border-light);
+}
+
+.snapshot-total .text-price {
+    font-size: 18px;
+}
+
+.snap-discount-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: #e53935;
+    background: rgba(229, 57, 53, 0.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.snapshot-footer {
+    padding: 8px 14px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-gray);
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    background: rgba(224, 231, 33, 0.05);
+}
+
+/* 隐藏版快照卡片（供 html2canvas 渲染） */
+.snapshot-card {
+    position: fixed;
+    left: -9999px;
+    top: 0;
+    width: 360px;
+    background: linear-gradient(180deg, #fefefe 0%, #f8f9f0 100%);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+/* 按钮行堆叠布局 */
+.btn-row-stack {
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-row-stack .btn {
+    width: 100%;
+    flex: none;
+    margin-top: 0;
+}
+
+/* ========== 图片预览弹窗 ========== */
+.image-preview-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.image-preview-modal.active { display: flex; }
+
+.image-preview-modal img {
+    max-width: 90%;
+    max-height: 70vh;
+    border-radius: 8px;
+}
+
+.image-preview-hint {
+    color: #fff;
+    font-size: 13px;
+    margin-top: 12px;
+    opacity: 0.7;
+}
+
+.image-preview-hint-top {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.image-preview-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========== 容器内边距 ========== */
+.container {
+    padding: 28px 24px 32px;
+}
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 380px) {
+    .container {
+        padding: 20px 16px 24px;
+    }
+
+    .pet-card {
+        padding: 10px 8px;
+    }
+
+    .pet-card .icon {
+        font-size: 24px;
+    }
+
+    .pet-card .label {
+        font-size: 13px;
+    }
+
+    .day-btn {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+
+    .flavor-item {
+        padding: 10px 12px;
+    }
+
+    .flavor-controls .btn-minus,
+    .flavor-controls .btn-plus {
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
+    }
+
+    .flavor-controls .flavor-input {
+        width: 40px;
+        font-size: 13px;
+    }
+
+    .price-value {
+        font-size: 20px;
+    }
+
+    .simulate-inline-value {
+        font-size: 16px;
+    }
+}
+
+/* ========== 数字输入框去箭头 ========== */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}

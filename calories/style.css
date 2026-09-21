@@ -137,7 +137,7 @@ html { scroll-behavior: smooth; }
     margin-right: 4px;
 }
 
-/* ========== 查看喂食量按钮 - 微光 + 光晕 + 萤火虫 ========== */
+/* ========== 查看喂食包数按钮 - 微光 + 光晕 + 萤火虫 ========== */
 .btn-wrapper {
     position: relative;
     display: inline-block;
