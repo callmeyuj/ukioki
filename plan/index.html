@@ -80,7 +80,7 @@
                         <div class="simulate-label">估算包数</div>
                         <div class="simulate-inline">
                             <span class="simulate-inline-value" id="simulatedPacksValue">-- 包</span>
-                            <button class="btn-link" id="adoptSimBtn" disabled>使用此数据 → </button>
+                            <button class="btn-link" id="adoptSimBtn" disabled>作为订阅总数 →</button>
                         </div>
                     </div>
                 </div>
@@ -135,28 +135,21 @@
             </div>
 
             <div class="btn-row">
-                <button class="btn btn-next" id="btnNext2" disabled>方案结果</button>
+                <button class="btn btn-next" id="btnNext2" disabled>方案快照</button>
             </div>
         </div>
 
-        <!-- ==================== Screen 3: 方案结果 ==================== -->
+        <!-- ==================== Screen 3: 方案快照 ==================== -->
         <div class="step" id="step-3">
             <div class="step-header">
                 <button class="btn-back-link" id="btnBack3">&lt;</button>
-                <div class="step-title">方案结果</div>
+                <div class="step-title">方案快照</div>
             </div>
 
             <!-- 快照卡片（Screen 3 可见版） -->
             <div class="snapshot-preview" id="snapshotPreview">
                 <div class="snapshot-header">
-                    <div class="snapshot-brand">
-                        <div class="snapshot-brand-name">uki oki · 订阅方案</div>
-                        <div class="snapshot-brand-slogan">科学定制，鲜食到家</div>
-                    </div>
-                    <div class="snapshot-qr">
-                        <img src="image/qrcode-service.png" alt="企微客服" class="snapshot-qr-img" crossorigin="anonymous">
-                        <div class="snapshot-qr-hint">企微客服</div>
-                    </div>
+                    <div class="snapshot-hint">请截图后分享给企微客服</div>
                 </div>
                 <div class="snapshot-section">
                     <div class="snapshot-section-title">── 方案明细 ──</div>
@@ -185,7 +178,7 @@
             </div>
 
             <div class="btn-row btn-row-stack">
-                <button class="btn btn-next" id="btnSaveSnapshot">💾 快照预览（截图保存）</button>
+                <button class="btn btn-next" id="btnContactService">💬 联系企微客服</button>
                 <button class="btn btn-back" id="btnRestart">↺ 重新规划</button>
             </div>
         </div>
@@ -194,7 +187,7 @@
     <!-- 图片预览弹窗 -->
     <div class="image-preview-modal" id="imagePreviewModal">
         <button class="image-preview-close" id="imagePreviewClose">✕</button>
-        <div class="image-preview-hint-top">请截图保存后，长按图片添加客服并分享</div>
+        <div class="image-preview-hint-top">长按图片添加客服，分享方案快照</div>
         <img id="imagePreviewImg" src="" alt="预览图片">
     </div>
 

@@ -97,7 +97,7 @@ function cacheDom() {
     els.snapOriginalPrice = document.getElementById('snapOriginalPrice');
     els.snapTotalPrice   = document.getElementById('snapTotalPrice');
     els.snapDate         = document.getElementById('snapDate');
-    els.btnSaveSnapshot  = document.getElementById('btnSaveSnapshot');
+    els.btnContactService = document.getElementById('btnContactService');
     els.btnRestart       = document.getElementById('btnRestart');
 
     // 通用
@@ -309,15 +309,26 @@ function renderPrice() {
 
 /** Screen 2：热量偏差提示（仅回程路径触发） */
 function renderCalorieDeviation() {
+    // TODO: 暂时隐藏热量校准功能，待后续优化
+    els.calorieDeviation.classList.add('hidden');
+    return;
+
     if (!state.returnContext.fromPlan || !state.returnContext.targetKcal) {
         els.calorieDeviation.classList.add('hidden');
         return;
     }
 
+    const days = state.subscription.days;
+    if (!days || days <= 0) {
+        els.calorieDeviation.classList.add('hidden');
+        return;
+    }
+
     const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
-    const actualKcal = calcTotalKcal(state.allocation, flavors);
-    const targetKcal = state.returnContext.targetKcal;
-    const diff = actualKcal - targetKcal;
+    const totalKcal = calcTotalKcal(state.allocation, flavors);
+    const dailyKcal = totalKcal / days;  // 日均摄入
+    const targetKcal = state.returnContext.targetKcal;  // 每日推荐
+    const diff = dailyKcal - targetKcal;
     const deviation = Math.abs(diff) / targetKcal;
 
     if (deviation <= PLAN_RULES.calorieDeviationThreshold) {
@@ -327,8 +338,8 @@ function renderCalorieDeviation() {
 
     const sign = diff > 0 ? '+' : '';
     els.deviationText.textContent =
-        '当前方案热量 ' + actualKcal + ' kcal，与推荐值偏差 ' + sign + diff + ' kcal（' +
-        (deviation * 100).toFixed(1) + '%）';
+        '日均摄入约 ' + Math.round(dailyKcal) + ' kcal，推荐 ' + Math.round(targetKcal) + ' kcal（偏差 ' +
+        sign + (deviation * 100).toFixed(1) + '%）';
     els.calorieDeviation.classList.remove('hidden');
 }
 
@@ -401,6 +412,7 @@ function doEvenSplit() {
     const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
     state.allocation = calcEvenSplit(state.subscription.packs, flavors);
     renderAllocate();
+    renderCalorieDeviation();
 }
 
 /** 清零 */
@@ -408,6 +420,7 @@ function doClearAll() {
     const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
     for (const f of flavors) state.allocation[f.id] = 0;
     renderAllocate();
+    renderCalorieDeviation();
 }
 
 /** 修改某口味包数（钳制到合法范围） */
@@ -417,6 +430,7 @@ function setFlavorPack(flavorId, value) {
     const clamped = Math.max(0, Math.min(Math.round(value), upper));
     state.allocation[flavorId] = clamped;
     renderAllocate();
+    renderCalorieDeviation();
 }
 
 /* ========== 天数选择 ========== */
@@ -478,6 +492,11 @@ async function saveSnapshot() {
 
 function closeImagePreview() {
     els.imagePreviewModal.classList.remove('active');
+}
+
+function showServiceQR() {
+    els.imagePreviewImg.src = 'image/qrcode-service.png';
+    els.imagePreviewModal.classList.add('active');
 }
 
 function showToast(msg) {
@@ -637,8 +656,8 @@ function bindEvents() {
     // 返回 Screen 2
     els.btnBack3.addEventListener('click', () => showScreen(2));
 
-    // 保存快照
-    els.btnSaveSnapshot.addEventListener('click', saveSnapshot);
+    // 联系企微客服
+    els.btnContactService.addEventListener('click', showServiceQR);
 
     // 重新规划
     els.btnRestart.addEventListener('click', restart);

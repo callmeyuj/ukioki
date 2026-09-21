@@ -17,7 +17,7 @@
 
 /* 页面主标题（Screen 1） */
 .page-header {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
 
 .step-title {
@@ -39,7 +39,8 @@
 .input.input-normal {
     font-size: 16px;
     font-weight: 600;
-    padding: 12px 44px 12px 14px;
+    padding: 10px 44px 10px 14px;
+    color: var(--brand-green);
 }
 
 .input.input-normal::placeholder {
@@ -50,7 +51,7 @@
 /* 小尺寸（模拟区用） */
 .input.input-sm {
     font-size: 14px;
-    padding: 8px 12px;
+    padding: 7px 12px;
     width: 100%;
 }
 
@@ -64,7 +65,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .step-header .step-title {
@@ -115,9 +116,9 @@
 
 /* ========== 区块 ========== */
 .section {
-    margin-bottom: 20px;
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-bottom: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
     border-top: 1px solid var(--border-light);
 }
 
@@ -128,10 +129,10 @@
 }
 
 .section-label {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--brand-dark);
-    margin-bottom: 14px;
+    margin-bottom: 10px;
 }
 
 .section-hint {
@@ -166,7 +167,7 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: var(--bg-card-selected);
+    background: var(--bg-cream);
     margin-left: auto;
     padding-left: 8px;
     flex-shrink: 0;
@@ -206,7 +207,7 @@
 
 
 .section-body {
-    margin-top: 14px;
+    margin-top: 12px;
 }
 
 .section.collapsed .section-body {
@@ -216,14 +217,14 @@
 /* ========== 宠物类型 ========== */
 .pet-options {
     display: flex;
-    gap: 12px;
+    gap: 10px;
 }
 
 .pet-card {
     flex: 1;
     border: 2px solid var(--border-light);
     border-radius: 12px;
-    padding: 14px 12px;
+    padding: 12px 10px;
     text-align: center;
     cursor: pointer;
     transition: all 0.25s ease;
@@ -232,8 +233,8 @@
 }
 
 .pet-card .icon {
-    font-size: 28px;
-    margin-bottom: 4px;
+    font-size: 26px;
+    margin-bottom: 3px;
     line-height: 1;
 }
 
@@ -271,12 +272,12 @@
 }
 
 /* ========== 模拟计算 ========== */
-.simulate-row { margin-bottom: 16px; }
+.simulate-row { margin-bottom: 14px; }
 
 .simulate-label {
     font-size: 13px;
     color: var(--brand-dark-light);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 500;
 }
 
@@ -291,11 +292,24 @@
     min-width: 0;
 }
 
+/* 包数计算区输入框焦点暗淡色 */
+#section-simulate .input.input-sm:focus {
+    border-color: #ccc;
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+/* 包数计算区 placeholder 字体调小 */
+#section-simulate .input.input-sm::placeholder {
+    font-size: 12px;
+    color: #999;
+}
+
 .btn-link {
     background: none;
     border: none;
     font-size: 13px;
-    color: var(--brand-green);
+    color: #666;
     cursor: pointer;
     padding: 0;
     white-space: nowrap;
@@ -313,27 +327,26 @@
 .day-btn {
     flex: 1;
     min-width: 0;
-    border: 1.5px solid var(--border-light);
+    border: 1.5px solid #e0e0e0;
     border-radius: 8px;
     padding: 7px 10px;
     font-size: 13px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    background: var(--bg-cream);
+    background: #fafafa;
     color: var(--brand-dark);
     font-weight: 500;
 }
 
 .day-btn:hover {
-    border-color: var(--brand-yellow-dark);
+    border-color: #ccc;
 }
 
 .day-btn.selected {
-    border-color: var(--brand-yellow);
-    background: var(--bg-card-selected);
+    border-color: #999;
+    background: #f0f0f0;
     font-weight: 600;
-    box-shadow: 0 2px 6px rgba(224, 231, 33, 0.12);
 }
 
 .day-btn.custom {
@@ -355,7 +368,7 @@
 .simulate-inline-value {
     font-size: 18px;
     font-weight: 700;
-    color: var(--brand-green);
+    color: var(--brand-dark);
 }
 
 .btn-sm {
@@ -370,12 +383,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 14px;
+    padding: 8px 12px;
     background: var(--bg-cream);
     border-radius: 10px;
     font-size: 12px;
     color: var(--text-gray);
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .shipping-info strong {
@@ -388,8 +401,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
-    gap: 12px;
+    margin-bottom: 14px;
+    gap: 10px;
 }
 
 .allocation-summary {
@@ -398,9 +411,12 @@
 }
 
 .allocation-count {
-    font-size: 14px;
+    font-size: clamp(12px, 3.5vw, 14px);
     font-weight: 600;
     color: var(--brand-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .allocation-hint {
@@ -434,14 +450,14 @@
 .flavor-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .flavor-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
+    padding: 12px 14px;
     background: var(--bg-cream);
     border-radius: 12px;
     border: 1px solid var(--border-light);
@@ -527,8 +543,8 @@
 
 /* ========== 价格面板 ========== */
 .price-panel {
-    margin-top: 20px;
-    padding: 18px 20px;
+    margin-top: 16px;
+    padding: 16px 18px;
     border: 2px dashed var(--brand-yellow);
     border-radius: 14px;
     background: rgba(224, 231, 33, 0.06);
@@ -538,7 +554,7 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .price-row:last-child { margin-bottom: 0; }
@@ -578,8 +594,8 @@
 
 /* ========== 热量偏差提示 ========== */
 .calorie-deviation {
-    margin-top: 16px;
-    padding: 12px 16px;
+    margin-top: 14px;
+    padding: 10px 14px;
     border-left: 3px solid #f39c12;
     background: rgba(243, 156, 18, 0.08);
     border-radius: 0 8px 8px 0;
@@ -603,7 +619,7 @@
 .snapshot-preview {
     width: 100%;
     max-width: 340px;
-    margin: 0 auto 20px;
+    margin: 0 auto 16px;
     background: linear-gradient(180deg, #fefefe 0%, #f8f9f0 100%);
     border-radius: 14px;
     border: 2px solid var(--brand-yellow);
@@ -614,47 +630,24 @@
 .snapshot-header {
     display: flex;
     align-items: center;
-    padding: 10px 14px;
+    justify-content: center;
+    padding: 10px 12px;
     border-bottom: 1px dashed var(--brand-yellow);
 }
 
-.snapshot-brand { flex: 1; min-width: 0; }
-
-.snapshot-brand-name {
-    font-size: 13px;
+.snapshot-hint {
+    font-size: 14px;
+    color: var(--brand-green);
     font-weight: 700;
-    color: var(--brand-dark);
-    line-height: 1.2;
-}
-
-.snapshot-brand-slogan {
-    font-size: 10px;
-    color: var(--text-gray);
-    line-height: 1.2;
-    margin-top: 1px;
-}
-
-.snapshot-qr {
     text-align: center;
-    flex-shrink: 0;
-    margin-left: 10px;
-}
-
-.snapshot-qr-img {
-    width: 110px;
-    height: 110px;
-    border-radius: 6px;
-    border: 1px solid var(--border-light);
-}
-
-.snapshot-qr-hint {
-    font-size: 10px;
-    color: var(--text-unit);
-    margin-top: 3px;
+    background: linear-gradient(135deg, #fff9e6 0%, #fff3cc 100%);
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--brand-yellow);
 }
 
 .snapshot-section {
-    padding: 10px 14px;
+    padding: 8px 12px;
     border-bottom: 1px dashed var(--brand-yellow);
 }
 
@@ -663,7 +656,7 @@
 .snapshot-section-title {
     font-size: 11px;
     color: var(--text-gray);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     text-align: center;
     letter-spacing: 1px;
 }
@@ -672,7 +665,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 3px 0;
+    padding: 2px 0;
     font-size: 13px;
     color: var(--brand-dark);
 }
@@ -682,8 +675,8 @@
 }
 
 .snapshot-total {
-    padding-top: 8px;
-    margin-top: 8px;
+    padding-top: 6px;
+    margin-top: 6px;
     border-top: 1px solid var(--border-light);
 }
 
@@ -701,7 +694,7 @@
 }
 
 .snapshot-footer {
-    padding: 8px 14px;
+    padding: 6px 12px;
     text-align: center;
     font-size: 10px;
     color: var(--text-gray);
