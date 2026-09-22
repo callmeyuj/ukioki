@@ -87,7 +87,7 @@ plan/ 用途：平均每日包数作为"确定总包数"的参考依据（如：
 | 犬 | 鸡肉鳕鱼 / 猪肉蓝莓 / 牛肉牡蛎 / 珍萃鹿肉 / 鸭肉冬瓜梨 | 120g | 121 / 149 / 144 / 154 / 130 kcal |
 | 猫 | 鸡肉鳕鱼 / 猪肉蓝莓 / 嫩牛牡蛎 / 野牧鹿肉 | 80g | 107 / 111 / 127 / 132 kcal |
 
-> 注：产品数据源头在 calories/script.js 的 `PRODUCT_DATA`（含"平均数据"行：犬 140 / 猫 119 kcal/包，即 plan/ 锚点口径，见决策 #16），未来如两处共用可考虑提取到 shared/
+> 注：产品数据统一维护在 `shared/utils.js` 的 `PRODUCT_DATA`（V1.2 起单一数据源）。平均热量可通过 `getAvgKcal('dog')` 动态计算（犬 ≈ 140 / 猫 ≈ 119 kcal/包，即 plan/ 锚点口径，见决策 #16），无需单独维护常量
 
 ### 价格数据（2026/09/08 确认，V1 仅犬）
 
@@ -284,9 +284,8 @@ plan/
 │  已分配: 75 / 75 包 ✓                          │
 │                                                │
 │  ─────────────────────────────                 │
-│  💰 参考预算                                   │
-│  ¥ 1,345.12        ¥ 1,582.50                 │
-│    (85 折)           (划线原价)                │
+│  实付 ¥ 1,345.12  |  优惠前 ¥ 1,582.50        │  ← 品牌绿 + 灰色划线
+│  共减 ¥ 237.38   [8.5折]                       │  ← 暖黄 + 低饱和红
 │  ─────────────────────────────                 │
 │                                                │
 │  ┌─ ⚡ 热量矫正提示（仅回程路径）─────────┐   │
@@ -299,28 +298,26 @@ plan/
 └──────────────────────────────────────────────┘
                       ↓
 ┌──────────────────────────────────────────────┐
-│ Screen 3: 方案结果                             │
+│ Screen 3: 订阅方案                             │
 │  [← 返回]                                      │
 │                                                │
 │  ┌─────── 方案快照卡片（截图区域）────────┐   │
-│  │  uki oki · 订阅方案          [QR码]    │   │
-│  │  科学定制，鲜食到家        企微客服    │   │
-│  │  ─────────────────────────────          │   │
-│  │  宠物：犬                              │   │
-│  │  订阅包数：75 包                       │   │
-│  │  免邮次数：2 次                        │   │
-│  │  配送周期：按需通知客服                │   │
-│  │  折扣：85 折                           │   │
-│  │  ─────────────────────────────          │   │
-│  │  鸡肉鳕鱼 15 包 · 猪肉蓝莓 20 包       │   │
-│  │  牛肉牡蛎 15 包 · 珍萃鹿肉 10 包       │   │
-│  │  鸭肉冬瓜梨 15 包                      │   │
-│  │  ─────────────────────────────          │   │
-│  │  折后总价：¥ 1,345.12                  │   │
-│  │  原价：¥ 1,582.50（划线）              │   │
+│  │   请截图后分享给企微客服（绿色高亮）  │   │
+│  │  ── 方案明细 ────────────────────────  │   │
+│  │  宠物         犬                       │   │
+│  │  配送日期     按需通知客服             │   │
+│  │  订阅总数     75 包（加粗）            │   │
+│  │  鸡肉鳕鱼         15 包               │   │
+│  │  猪肉蓝莓         20 包               │   │
+│  │  牛肉牡蛎         15 包               │   │
+│  │  珍萃鹿肉         10 包               │   │
+│  │  鸭肉冬瓜梨       15 包               │   │
+│  │  ──────────────────────────────────   │   │
+│  │  实付 ¥ 1,345.12 | 优惠前 ¥ 1,582.50 │   │
+│  │  共减 ¥ 237.38  [85折]              │   │
 │  └──────────────────────────────────────┘   │
 │                                                │
-│       [💾 保存方案快照]                         │
+│       [💬 联系企微客服]                        │
 │       [↺ 重新规划]                             │
 └──────────────────────────────────────────────┘
 ```
@@ -427,19 +424,18 @@ const PLAN_RULES = {
   ],
 };
 
-// ── 产品数据（按 petType 组织，V1 仅犬）──
+// ── 产品数据（shared/utils.js 单一数据源，Object.freeze 保护）──
+// 访问方式：getFlavors(petType) 取口味列表，getAvgKcal(petType) 动态算平均
+// 不再维护本地 avgKcal 常量（口味增减时自动同步）
 const PRODUCT_DATA = {
-  dog: {
-    flavors: [
-      { name: '鸡肉鳕鱼',   grams: 120, kcal: 121, price: 18.5 },
-      { name: '猪肉蓝莓',   grams: 120, kcal: 149, price: 20.5 },
-      { name: '牛肉牡蛎',   grams: 120, kcal: 144, price: 22.5 },
-      { name: '珍萃鹿肉',   grams: 120, kcal: 154, price: 28.0 },
-      { name: '鸭肉冬瓜梨', grams: 120, kcal: 130, price: 18.5 },
-    ],
-    avgKcal: 140,  // 平均单包热量（锚点口径，决策 #16）
-  },
-  cat: null,  // V1 预留，猫数据确定后填入
+  dog: [
+    { id: 'chicken_cod',    name: '鸡肉鳕鱼',   grams: 120, kcal: 121, price: 18.8 },
+    { id: 'pork_blueberry', name: '猪肉蓝莓',   grams: 120, kcal: 149, price: 22.8 },
+    { id: 'beef_oyster',    name: '牛肉牡蛎',   grams: 120, kcal: 144, price: 25.8 },
+    { id: 'venison',        name: '珍萃鹿肉',   grams: 120, kcal: 154, price: 29.8 },
+    { id: 'duck_winter',    name: '鸭肉冬瓜梨', grams: 120, kcal: 130, price: 19.8 },
+  ],
+  cat: [ ... ],  // 猫口味列表，price 暂为 null（V2 补充）
 };
 
 // ── 全局状态（按 Screen 分组，便于扩展与局部重置） ──
@@ -455,7 +451,7 @@ const state = {
   },
 
   allocation: [],              // 各口味包数数组，长度动态
-                                // = PRODUCT_DATA[petType].flavors.length
+                                // = getFlavors(petType).length
                                 // 进入 Screen 2 时由 getDefaultAllocation 填充
 
   delivery: {
@@ -512,43 +508,37 @@ calcHeatDeviation(flavorAlloc, targetKcal, days, petType)
 
 | 未来变更 | 当前设计如何应对 |
 |----------|------------------|
-| **猫上线** | 填 `PRODUCT_DATA.cat` + 解除 Screen 1 猫选项置灰；`state.petType` 切换时清空 `allocation`；函数传 petType 参数零改动 |
+| **猫上线** | 填 `PRODUCT_DATA.cat` 的价格字段（shared/utils.js）+ 解除 Screen 1 猫选项置灰；`state.petType` 切换时清空 `allocation`；函数传 petType 参数零改动 |
 | **折扣维度切换（包数 → 时长）** | `PLAN_RULES` 增字段 + `getDiscountRate` 函数体调整；UI 不动 |
-| **口味数量增减** | `allocation` 数组长度动态；`PRODUCT_DATA` 增删条目即可 |
+| **口味数量增减** | `allocation` 数组长度动态；在 shared/utils.js 的 `PRODUCT_DATA` 增删条目即可（两个模块自动同步） |
 | **配送次数 UI 重新启用** | Screen 3 UI 已删除但 `state.delivery` 分组、`isDeliveryOverQuota` 函数、`PLAN_RULES.packsPerFreeDelivery` 配置均保留；重新启用只需：① 恢复 Screen 3 UI ② 把 `state.delivery.count` 默认值（= 免邮次数）改为用户可输入 ③ 主链路零改动 |
 | **新增 Screen** | state 新增分组即可，不影响现有分组 |
 | **价格 / 折扣档位调整** | 改对应配置即可，函数不动 |
 
-### 快照卡片版式（2026/09/21 确认）
+### 快照卡片版式（2026/09/21 确认，2026/09/22 更新）
 
-> 核心定位：**给客服看的订单摘要**——用户截图保存后发给企微客服，作为沟通介质。复用 calories/ 的 html2canvas 技术方案，视觉风格与 calories/ 保持一致（品牌黄虚线分隔、渐变背景、QR 码、图片预览弹窗）。
+> 核心定位：**给客服看的订单摘要**——用户截图保存后发给企微客服，作为沟通介质。复用 calories/ 的 html2canvas 技术方案。V1.01 简化：移除品牌名+口号+QR 码（改弹窗展示），合并「方案摘要」与「口味明细」为统一的「方案明细」区块；V1.1 进一步紧凑化。
 
-#### 版式结构（360px 宽，4 个区块）
+#### 版式结构（可见版 max-width 340px / 隐藏渲染版 360px，4 个区块）
 
 ```
 ┌────────────────────────────────────────┐
-│  🐾 uki oki 订阅方案          [QR码]  │  ← Header（品牌 + 企微客服）
-│     科学定制，鲜食到家        企微客服 │
+│     请截图后分享给企微客服             │  ← Header（纯提示，无品牌/QR）
 ├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│  ── 方案摘要 ────────────────────────  │
+│  ── 方案明细 ────────────────────────  │  ← 合并区块（原摘要+口味合二为一）
 │  宠物         犬                       │
-│  订阅包数     75 包                    │
-│  免邮次数     2 次                     │  ← 系统算 ⌊A÷30⌋
-│  配送周期     按需通知客服             │  ← 文案固定
-│  折扣         85 折                    │
-├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│  ── 口味明细 ────────────────────────  │
-│  鸡肉鳕鱼         15 包                │
+│  配送日期     按需通知客服             │
+│  订阅总数     75 包（加粗）            │
+│  鸡肉鳕鱼         15 包                │  ← 口味列表动态渲染（仅 count > 0）
 │  猪肉蓝莓         20 包                │
 │  牛肉牡蛎         15 包                │
 │  珍萃鹿肉         10 包                │
 │  鸭肉冬瓜梨       15 包                │
 ├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│  原价                  ¥ 1,582.50      │  ← 14px 灰色 删除线
-│                                        │
-│  折后总价              ¥ 1,345.12      │  ← 32px 加粗 品牌绿
+│  实付 ¥ 1,345.12  |  优惠前 ¥ 1,582.50 │  ← 品牌绿主价 + 灰色划线
+│  共减 ¥ 237.38  [85折]                │  ← 暖黄标签 + 低饱和红折扣标签
 ├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
-│  📦 30包起送免邮 · 2026/09/21 生成     │  ← Footer
+│  📦 30包起送免邮 · 2026/09/22          │  ← Footer
 └────────────────────────────────────────┘
 ```
 
@@ -556,30 +546,37 @@ calcHeatDeviation(flavorAlloc, targetKcal, days, petType)
 
 | 元素 | 字号 | 颜色 | 字重 | 备注 |
 |------|------|------|------|------|
-| Header 品牌名 | 16px | `--brand-dark` | 700 | 同 calories/ |
-| Header 口号 | 11px | `--text-gray` | 400 | 同 calories/ |
-| QR 码 | 50×50px | 品牌黄边框 | — | 静态图片 `plan/image/qrcode-service.png`（企微客服二维码） |
-| Section 标题 | 14px | `--brand-dark` | 700 | "方案摘要" / "口味明细" |
-| 正文 | 14px | `--brand-dark` | 400 | 左对齐，键值左右分布 |
-| 折后总价 | **32px** | `--brand-green` | 800 | **最显眼**（同 calories/ MER 高亮风格）；**实际颜色需看效果再最终确认** |
-| 原价 | 14px | `#999` | 400 | 删除线 |
-| Footer | 12px | `--text-gray` | 400 | 居中 |
-| 卡片整体 | — | 渐变背景 `#fefefe → #f8f9f0` | — | 圆角 16px，宽 360px |
-| 分隔线 | — | `--brand-yellow` | — | 虚线（同 calories/） |
+| Header 提示文字 | 14px | `--brand-green` | 700 | 浅黄渐变背景 `#fff9e6 → #fff3cc` + 品牌黄边框 + 圆角 8px |
+| Section 标题「── 方案明细 ──」 | 11px | `--text-gray` | 400 | 居中，letter-spacing 1px |
+| 正文字段（宠物/配送日期/口味等） | 13px | `--brand-dark` | 400 | 键值左右分布（flex space-between） |
+| 字段键（左侧标签） | 13px | `--text-gray` | 400 | — |
+| 订阅总数值 | 13px | `--brand-dark` | 700（加粗） | `text-bold` 类 |
+| 「实付」标签 | 13px | `--brand-green-light`（`#6A8F2D`） | 500 | 品牌浅绿，覆盖默认首子元素灰色规则 |
+| 实付价格数值 | **18px** | `--brand-green`（`#4A6A1D`） | 700 | 主视觉，`text-price` 类，品牌绿色 |
+| 分隔符 `\|` | 13px | `#ddd` | 400 | 实付与优惠前之间 |
+| 「优惠前」标签 | 13px | `#999` | 400 | 灰色 |
+| 优惠前价格数值 | 13px | `#999` | 400 | 删除线（`text-strike` 类） |
+| 共减标签（如「共减 ¥ 237.38」） | 11px | `--brand-green`（`#4A6A1D`） | 500 | 暖黄底 `rgba(229,246,20,0.18)` + 圆角 4px（`.price-savings-tag`） |
+| 折扣标签（如「85折」） | 11px | `--brand-green`（`#4A6A1D`） | 600 | 暖黄底 `rgba(229,246,20,0.18)` + 圆角 4px（与共减标签同色系） |
+| Footer | 10px | `--text-gray` | 400 | 居中，flex gap 6px，浅黄底 `rgba(224,231,33,0.05)` |
+| 卡片整体（可见版） | — | 渐变背景 `#fefefe → #f8f9f0` | — | 圆角 14px，max-width 340px，品牌黄边框 2px，box-shadow |
+| 卡片整体（隐藏版 html2canvas） | — | 渐变背景 `#fefefe → #f8f9f0` | — | 圆角 16px，width 360px，padding 20px |
+| 区块间分隔线 | — | `--brand-yellow` | — | 虚线 1px（`1px dashed`） |
 
 #### 字段清单
 
-- ✅ 品牌标识（uki oki · 订阅方案）+ 口号（科学定制，鲜食到家）
-- ✅ 企微客服 QR 码（静态图片 `plan/image/qrcode-service.png`）
+- ✅ Header 提示语「请截图后分享给企微客服」（绿色加粗，浅黄渐变背景）
 - ✅ 宠物类型
-- ✅ 订阅包数 A
-- ✅ 免邮次数（系统算：⌊A÷30⌋）
 - ✅ 配送周期（固定文案："按需通知客服"）
-- ✅ 折扣率
-- ✅ 各口味包数明细（5 行）
-- ✅ 折后总价（主视觉，32px 品牌绿加粗，实际颜色待看效果确认）
-- ✅ 原价（划线，14px 灰色）
-- ✅ Footer：📦 30 包起送免邮 + 生成时间（格式 "2026/09/21 生成"）
+- ✅ 订阅包数 A（加粗）
+- ✅ 各口味包数明细（动态渲染，仅显示 count > 0 的口味）
+- ✅ 实付价（品牌绿主视觉，18px）+ 优惠前价（灰色划线）
+- ✅ 共减金额 + 折扣标签（均为暖黄底品牌绿字，统一色系）
+- ✅ Footer：📦 30 包起送免邮 + 生成时间（格式 "YYYY/MM/DD"）
+- ❌ **不含**品牌标识 / 口号（V1.01 移除）
+- ❌ **不含**企微客服 QR 码图片（V1.01 改为点击「💬 联系企微客服」按钮弹窗全屏展示）
+- ❌ **不含**免邮次数（已在 Screen 1 实时显示，快照省略）
+- ❌ **不含**折扣率独立字段（折以「X折」标签附在总价行）
 - ❌ **不含**热量偏差（过程信息，不进快照）
 - ❌ **不含**配送次数（UI 已删除）
 
@@ -588,10 +585,10 @@ calcHeatDeviation(flavorAlloc, targetKcal, days, petType)
 | 项 | 方案 |
 |----|------|
 | html2canvas | CDN v1.4.1（同 calories/：`https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js`） |
-| QR 码 | 静态图片 `plan/image/qrcode-service.png`（企微客服二维码，**需用户提供**） |
-| 卡片 DOM | 屏外隐藏（`left: -9999px`），渲染时临时捕获 |
-| 图片预览 | 自定义弹窗（同 calories/），支持长按保存/转发 |
-| 微信端 | 长按图片保存或转发（弹窗内提示"长按图片保存或分享"） |
+| 企微客服 QR 码 | **不在快照卡片内**；点击「💬 联系企微客服」按钮 → 调用 `showServiceQR()` → 图片预览弹窗全屏展示 `image/qrcode-service.png`，便于长按识别 |
+| 快照卡片 DOM | 可见版（`#snapshotPreview`，max-width 340px）+ 隐藏版（`#snapshotCard`，left -9999px，width 360px）；截图时 `snapshotCard.innerHTML = snapshotPreview.innerHTML` 同步内容 |
+| 图片预览 | 自定义弹窗（`#imagePreviewModal`，同 calories/），顶部提示「长按图片添加客服，分享方案快照」 |
+| 微信端 | 长按图片保存或转发 |
 | 桌面端 | 直接下载 PNG |
 
 ### calories/ 改动影响评估（2026/09/21 确认）
@@ -687,15 +684,125 @@ plan/?pet=dog&packs=<平均每日包数>&kcal=<目标热量>
 - 任何屏返回上一屏，state 保留
 - 任何屏修改数据，后续屏的数据如受影响需重算（如 Screen 1 改 A，返回 Screen 2 时口味分配需重新校验 Σ = A）
 
-**快照卡片（Screen 3）内容**：
-- 品牌标识 + 口号 + 企微客服 QR 码
-- 宠物类型
-- 订阅包数 A、免邮次数（⌊A÷30⌋）、配送周期（按需通知客服）、折扣率
-- 各口味包数明细
-- 折后总价（主视觉）、原价（划线）
+**快照卡片（Screen 3）内容**（V1.01 简化，2026/09/22 更新）：
+- Header：提示语「请截图后分享给企微客服」（绿色高亮，无品牌名/口号/QR 码）
+- 方案明细（合并区块）：宠物类型、配送周期（按需通知客服）、订阅包数 A（加粗）
+- 口味明细（同一区块内）：各口味包数（仅 count > 0 动态显示）
+- 价格区：实付（品牌绿主价）+ 优惠前（灰色划线）+ 共减 / 折扣标签（统一暖黄底品牌绿字）
 - Footer：📦 30 包起送免邮 + 生成时间
-- **不含**热量偏差、**不含**配送次数（UI 已删除）
+- 企微客服 QR 码：由「💬 联系企微客服」按钮弹窗全屏展示（不在卡片内）
+- **不含**免邮次数、**不含**折扣率独立字段、**不含**热量偏差、**不含**配送次数
 - 快照定位："给客服看的订单摘要"
+
+---
+
+## 代码术语与修改速查
+
+> 沟通时按业务名找代码位置，按修改意图找对应文件/函数。
+
+### 一、文件职责
+
+| 文件 | 负责什么 | 改什么去这找 |
+|------|---------|-------------|
+| **index.html** | 页面结构、元素、文本内容 | 增删字段、改 placeholder 文字、改按钮文案、改静态文案（标题/提示语） |
+| **style.css** | 所有视觉样式 | 字号/颜色/间距/背景/边框/placeholder 样式/布局 |
+| **script.js** | 逻辑与数据 | 业务规则、计算、状态、事件、渲染、DOM 操作 |
+
+> ⚠️ **placeholder 澄清**：文字内容在 `index.html` 的 `placeholder="..."` 属性里改；样式（字号/颜色）在 `style.css` 的 `::placeholder` 规则里改；`script.js` 不直接控制 placeholder。
+
+### 二、Screen 1（基础配置）术语
+
+| 业务名 | HTML 选择器 | JS 中 els 缓存名 | 改文字去 | 改样式去 | 改逻辑去 |
+|--------|------------|------------------|---------|---------|---------|
+| 页面标题「个性化订阅」 | `.step-title`（step-1 内） | — | index.html:17 | style.css `.step-title` | — |
+| 副标题「为爱宠定制...」 | `.step-desc` | — | index.html:18 | style.css `.step-desc` | — |
+| 宠物类型区 | `#section-pet` → `#petOptions` | `els.petOptions` | 卡片文案在 index.html:25-33 | `.pet-card` / `.pet-badge` | `bindEvents()` 宠物点击（script.js:577） |
+| **订阅总数** | `#section-packs` → `#packsInput` | `els.packsInput` | placeholder 文字在 index.html:41 | style.css `#section-packs .input.input-normal` + `::placeholder` | `renderPacks()` script.js:199；校验门槛 `PLAN_RULES.minPacks` |
+| 起订提示「起订门槛 30 包」 | `#packsHint` | `els.packsHint` | index.html:44 | `.hint-error` | `renderPacks()` script.js:203-207 |
+| **免邮信息条** | `#shippingInfo` | `els.shippingInfo` / `els.freeDeliveryCount` | index.html:48-51 | `.shipping-info` | `renderShippingInfo()` script.js:214（调 `calcFreeDelivery()`） |
+| **模拟计算区**（可折叠） | `#section-simulate` | — | index.html:54-87 | `#section-simulate` + `.section-collapse` | 折叠逻辑 `bindEvents()` script.js:564-574 |
+| 区标题「包数计算」 | `#simulateToggle` | — | index.html:56 | `.section-label` | — |
+| **每日包数输入** | `#dailyPacksInput` | `els.dailyPacksInput` | placeholder 文字在 index.html:63 | `.input.input-sm` + `#section-simulate .input.input-sm::placeholder` | `renderSimulate()` script.js:220 |
+| **「热量计算器 →」链接** | `#goCaloriesBtn` | `els.goCaloriesBtn` | index.html:64 | `.btn-link` | `goToCalories()` script.js:467（拼 URL） |
+| **天数快捷按钮**（30/90/180） | `#dayOptions` → `.day-btn` | `els.dayOptions` | index.html:71-74 | `.day-btn` / `.day-btn.selected` | `selectDayOption()` script.js:438 |
+| **自定义天数输入** | `#customDaysInput` | `els.customDaysInput` | placeholder 文字在 index.html:76 | `.input.input-sm.hidden` | `bindEvents()` script.js:602-609 |
+| **估算包数**（D 值，只读） | `#simulatedPacksValue` | `els.simulatedPacksValue` | —（JS 动态写入） | `.simulate-inline-value` | `renderSimulate()` script.js:228；计算函数 `calcSimulatedPacks()` script.js:132 |
+| **「作为订阅总数 →」** | `#adoptSimBtn` | `els.adoptSimBtn` | index.html:83 | `.btn-link[disabled]` | `adoptSimulatedValue()` script.js:456 |
+| **「口味分配」下一步** | `#btnNext1` | `els.btnNext1` | index.html:90（按钮文案） | `.btn.btn-next` | `showScreen(2)` script.js:618 |
+
+### 三、Screen 2（口味分配）术语
+
+| 业务名 | HTML 选择器 | JS els | 改文字 | 改样式 | 改逻辑 |
+|--------|------------|--------|--------|--------|--------|
+| 返回按钮 | `#btnBack2` | `els.btnBack2` | index.html:97（`<` 符号） | `.btn-back-link` | `showScreen(1)` script.js:623 |
+| 页面标题「分配口味」 | `.step-title`（step-2 内） | — | index.html:98 | style.css `.step-title` | — |
+| **分配汇总栏**「已分配 X / Y 包」 | `.allocation-toolbar` → `#allocationCount` | `els.allocatedCount` / `els.totalCount` / `els.allocationHint` | "还剩 X 包" 等提示在 script.js `renderAllocate()` 行 279-281 | `.allocation-toolbar` / `.allocation-summary` / `.allocation-hint` | `renderAllocate()` script.js:267 |
+| **平均分配按钮** | `#btnEvenSplit` | `els.btnEvenSplit` | index.html:109 | `.btn-link` | `doEvenSplit()` script.js:411（调 `calcEvenSplit()` 行 138） |
+| **重新分配按钮** | `#btnClearAll` | `els.btnClearAll` | index.html:110 | `.btn-link` | `doClearAll()` script.js:419 |
+| **口味列表**（动态渲染） | `#flavorList` | `els.flavorList` | 文案由共享 `PRODUCT_DATA`（shared/utils.js）驱动，通过 `getFlavors(petType)` 访问 | `.flavor-list` / `.flavor-item` / `.flavor-name` / `.flavor-price` | `renderFlavors()` |
+| 单口味行 `[− X +]` | 行内动态生成 | — | 口味名+单价在 `PRODUCT_DATA`（shared/utils.js）；`[− X +]` 结构在 `renderFlavors()` | `.flavor-controls` / `.btn-minus` / `.flavor-input` / `.btn-plus` | 点击/输入事件 `bindEvents()`，调 `setFlavorPack()` |
+| **价格面板**（实付 / 优惠前 / 共减） | `.price-panel` | `els.priceOriginal` / `els.priceValue` / `els.priceRate` / `els.priceSavings` | "实付" / "优惠前" 标签 + "共减 ¥ X" 文案在 index.html:118-130 | `.price-panel` / `.price-actual-label` / `.price-actual-value` / `.price-separator` / `.price-original-label` / `.price-original-value` / `.price-savings-tag` / `.price-rate`（品牌绿色主价 + 暖黄共减 + 低饱和红折扣，参考 `plan/image/淘宝价格参考.jpg` 结构） | `renderPrice()` script.js:291（调 `calcOriginalPrice()` + `getDiscountTier()`，新增共减 = 原价 − 折后） |
+| **热量偏差提示**（V1.1 暂隐藏） | `#calorieDeviation` | `els.calorieDeviation` / `els.deviationText` | 文案在 script.js `renderCalorieDeviation()` 行 340-342 | `.calorie-deviation` / `.deviation-text` / `.deviation-link` | `renderCalorieDeviation()` script.js:311（当前 `return` 跳过，TODO 注释） |
+| **「查看方案」下一步** | `#btnNext2` | `els.btnNext2` | index.html:138 | `.btn.btn-next[disabled]` | `showScreen(3)` script.js:652 |
+
+### 四、Screen 3（订阅方案）术语
+
+| 业务名 | HTML 选择器 | JS els | 改文字 | 改样式 | 改逻辑 |
+|--------|------------|--------|--------|--------|--------|
+| 返回按钮 | `#btnBack3` | `els.btnBack3` | index.html:145 | `.btn-back-link` | `showScreen(2)` script.js:657 |
+| **快照卡片（可见版）** | `#snapshotPreview` | `els.snapshotPreview` | 文案在 index.html:150-173 + JS `renderSnapshot()` 动态填充 | `.snapshot-preview` / `.snapshot-header` / `.snapshot-hint` / `.snapshot-section` / `.snapshot-field` / `.snapshot-footer` | `renderSnapshot()` script.js:347 |
+| Header 提示「请截图后分享给企微客服」 | `.snapshot-hint` | — | index.html:152 | `.snapshot-hint`（style.css:638） | — |
+| 方案明细区块 | `.snapshot-section` | — | "── 方案明细 ──" 在 index.html:155 | `.snapshot-section-title` | — |
+| 快照内口味列表 | `#snapFlavorList` | `els.snapFlavorList` | JS 动态渲染（`renderSnapshot()` 行 366-373） | `.snapshot-field` | `renderSnapshot()` script.js:366 |
+| 快照价格区 | `.snapshot-price-section` | — | "实付" / "优惠前" 标签 + "共减 ¥ X" 文案在 index.html:162-176 | `.snapshot-price-section` / `.snapshot-field` / `.snapshot-total` / `.price-actual-label` / `.price-original-label` / `.price-separator` / `.price-savings-tag` / `.text-price` / `.text-strike` / `.snap-discount-tag` | `renderSnapshot()` script.js:347 |
+| 快照实付价格 | `#snapTotalPrice` | `els.snapTotalPrice` | —（JS 动态） | `.text-price`（品牌绿 `--brand-green`，18px） | `renderSnapshot()` script.js:376 |
+| 快照优惠前价格 | `#snapOriginalPrice` | `els.snapOriginalPrice` | —（JS 动态） | `.text-strike` | `renderSnapshot()` script.js:375 |
+| 快照共减金额 | `#snapSavings` | `els.snapSavings` | —（JS 动态） | `.price-savings-tag`（浅橙底 `#FFF3E0`） | `renderSnapshot()` script.js:377 |
+| 快照折扣标签 | `#snapDiscount` | `els.snapDiscount` | —（JS 动态） | `.snap-discount-tag` | `renderSnapshot()` script.js:358-363 |
+| **快照卡片（隐藏渲染版）** | `#snapshotCard` | `els.snapshotCard` | 内容从 `snapshotPreview` 复制（script.js:476） | `.snapshot-card`（style.css:708，width 360px 供 html2canvas） | `saveSnapshot()` script.js:474（html2canvas 调用） |
+| **「💬 联系企微客服」** | `#btnContactService` | `els.btnContactService` | index.html:181 | `.btn.btn-next`（复用） | `showServiceQR()` script.js:497（展示二维码图片） |
+| **「↺ 重新规划」** | `#btnRestart` | `els.btnRestart` | index.html:182 | `.btn.btn-back` | `restart()` script.js:510（清 state + 回 Screen 1） |
+
+### 五、通用组件术语
+
+| 业务名 | 选择器 | JS els | 改文字 | 改样式 | 改逻辑 |
+|--------|--------|--------|--------|--------|--------|
+| **图片预览弹窗** | `#imagePreviewModal` | `els.imagePreviewModal` / `els.imagePreviewImg` | 顶部提示"长按图片添加客服..."在 index.html:190 | `.image-preview-modal` / `.image-preview-close` / `.image-preview-hint-top`（style.css:730+） | `saveSnapshot()` script.js:486 打开；`closeImagePreview()` script.js:493 关闭 |
+| **Toast 提示** | `#toast` | `els.toast` | "已保存到相册" 在 index.html:195 | `.toast` / `.toast.show` | `showToast()` script.js:502 |
+
+### 六、script.js 架构（按函数类别）
+
+| 类别 | 函数命名前缀 | 作用 | 举例 |
+|------|-------------|------|------|
+| **格式化工具** | `fmtXxx` / `formatXxx` | 数值 → 显示字符串 | `formatMoney()`（共享，含千位分隔符）/ `formatDate()`（共享）/ `fmtDiscount()`（本地） |
+| **纯函数（计算）** | `calcXxx` / `getXxx` | 不依赖 state，参数进结果出，便于测试 | `calcFreeDelivery()` / `calcSimulatedPacks()` / `calcEvenSplit()` / `calcOriginalPrice()` / `getDiscountTier()` / `sumAllocation()` / `calcTotalKcal()` / `flavorUpperLimit()` |
+| **渲染函数** | `renderXxx` | 把 state/数据同步到 DOM | `renderPacks()` / `renderShippingInfo()` / `renderSimulate()` / `renderFlavors()` / `renderAllocate()` / `renderPrice()` / `renderCalorieDeviation()` / `renderSnapshot()` |
+| **操作函数** | `doXxx` / `setXxx` / `selectXxx` | 用户动作触发，改 state 后调 render | `doEvenSplit()` / `doClearAll()` / `setFlavorPack()` / `selectDayOption()` / `adoptSimulatedValue()` |
+| **屏幕控制** | `showScreen(n)` | 切屏 + 调对应 render | script.js:388 |
+| **生命周期** | `init()` / `cacheDom()` / `bindEvents()` / `parseUrlParams()` | 启动流程 | script.js:676 / 57 / 560 / 532 |
+| **跨模块跳转** | `goToCalories()` | 跳 calories/（带 `from=plan` 参数） | script.js:467 |
+| **快照/弹窗** | `saveSnapshot()` / `showServiceQR()` / `closeImagePreview()` / `showToast()` | 截图、弹窗、提示 | script.js:474 / 497 / 493 / 502 |
+
+### 七、数据常量
+
+| 名称 | 位置 | 内容 |
+|------|------|------|
+| `PLAN_RULES` | script.js:6 | 折扣阶梯 tiers、起订门槛 `minPacks`、免邮系数 `packsPerFreeDelivery`、热量偏差阈值 `calorieDeviationThreshold` |
+| `PRODUCT_DATA` | **shared/utils.js** | 犬/猫口味列表（id/name/grams/kcal/price），Object.freeze 保护；通过 `getFlavors(petType)` 访问 |
+| `PET_CONFIG` | **shared/utils.js** | 宠物 icon/label；通过 `PET_CONFIG[petType].label` 访问 |
+| `calcPriceSummary()` | script.js（renderPrice 前） | 公共价格计算（原价/折扣/折后/节省），`renderPrice()` 和 `renderSnapshot()` 共用 |
+| `state` | script.js:35 | 全局状态：`subscription`（petType / packs A / dailyPacks B / days C / simulatedPacks D）、`allocation`、`delivery`、`returnContext` |
+
+### 八、修改路径速查
+
+- **改订阅总数的 placeholder 文字** → index.html:41 的 `placeholder="30包起订，120g/包"`
+- **改订阅总数 placeholder 样式** → style.css `#section-packs .input.input-normal::placeholder`
+- **改订阅总数输入时数字颜色** → style.css `#packsInput`（`color: var(--brand-green)`）
+- **改折扣阶梯/起订门槛** → script.js `PLAN_RULES` 常量（行 6-16）
+- **改口味数据（单价/热量/克数）** → shared/utils.js `PRODUCT_DATA`（单一数据源，两个模块共用）
+- **改某屏的渲染逻辑** → 找对应 `renderXxx()` 函数
+- **改用户交互** → 找 `bindEvents()` 里对应的事件绑定（script.js:560-672）
+- **改跨模块跳转** → `goToCalories()` / `parseUrlParams()`
 
 ---
 
@@ -709,7 +816,7 @@ plan/?pet=dog&packs=<平均每日包数>&kcal=<目标热量>
 
 ## 当前版本
 
-**V1.1** — 2026/09/22（UI 优化：页面紧凑度提升、包数计算区块黑灰淡色化、订阅总数品牌绿色、已分配包数自适应字体、展开收起按钮去品牌色边框；功能修复：热量偏差计算加入天数、暂时隐藏热量偏差功能）
+**V1.2** — 2026/09/22（跨模块架构优化：`PRODUCT_DATA` 迁移至 shared/utils.js 单一数据源；新增 `calcPriceSummary()` 消除 renderPrice/renderSnapshot 重复计算；`fmtMoney` 改用共享 `formatMoney`（修复千位符 bug）；`formatDate` 替换重复日期格式化；CSS 死代码清理 + 特异性补丁清理）
 
 ---
 
@@ -730,6 +837,8 @@ plan/?pet=dog&packs=<平均每日包数>&kcal=<目标热量>
 
 | 时间 | 内容 |
 |------|------|
+| 2026/09/22 | **V1.2 跨模块架构优化**：① script.js（696→661 行，-35 行）：`PRODUCT_DATA` 迁移至 shared/utils.js 单一数据源（删除本地定义含未用 `avgKcal`）；`PRODUCT_DATA[petType].flavors` → `getFlavors(petType)`（8 处）；`fmtMoney` 改用共享 `formatMoney`（修复千位符 bug）；新增 `calcPriceSummary()` 消除 renderPrice/renderSnapshot 重复计算；`formatDate()` 替换 2 处重复日期格式化；`pet === 'dog' ? '犬' : '猫'` → `PET_CONFIG[petType].label` ② style.css（946→933 行，-13 行）：删死代码（`.text-price`/`.snapshot-total-right`/`.snapshot-total .text-price`/重复 `.btn-back-link:hover`）；移除 `.snapshot-price-section span.price-actual-label` 等冗余特异性补丁（根因 `:not()` 选择器已修） |
+| 2026/09/22 | **文档与样式优化**：① CLAUDE.md 快照卡片版式同步至当前实际结构（合并「方案摘要」+「口味明细」为统一「方案明细」区块；Header 改为提示语、QR 码改弹窗展示；视觉规范更新实际字号/颜色；字段清单同步）② CLAUDE.md 页面流程图 Screen 3 ASCII 图同步合并后结构 + 「💬 联系企微客服」按钮文案 ③ CLAUDE.md 新增「代码术语与修改速查」章节（文件职责 + Screen 1/2/3 术语表 + 通用组件 + script.js 架构 + 数据常量 + 修改路径速查），便于后续高效沟通 ④ style.css 新增订阅总数 placeholder 缩小变淡规则（`#section-packs .input.input-normal::placeholder`，12px #999，与模拟区一致） |
 | 2026/09/22 | **V1.02 UI 优化与功能修复**：① 页面紧凑度优化：全面优化三个页面的字体大小和间距（Screen 1 标题 32→24px/区块 20→16px/标签 16→15px，Screen 2 头部 24→20px/口味列表 12→10px，Screen 3 卡片底部 20→16px/提示文字 15→14px）② 包数计算区块视觉优化：颜色调整为黑灰淡色（链接按钮灰 #666、天数按钮灰色系、估算数值品牌深色），输入框焦点暗淡色（灰边框 #ccc + 淡阴影），placeholder 调小为 12px #999，展开收起按钮去品牌色边框改物流运费底纹色 ③ 订阅总数输入框数字颜色：品牌深色→品牌绿色 ④ 已分配包数自适应字体：clamp(12px, 3.5vw, 14px) 确保多位数一行展示 ⑤ 按钮文案：「使用此数据 →」→「作为订阅总数 →」⑥ 功能修复：热量偏差计算加入订阅天数（日均 vs 每日推荐），暂时隐藏热量偏差功能 |
 | 2026/09/21 | **V1.01 UI 文案优化与交互简化**：① Screen 2 底部按钮文案「方案结果」→「方案快照」② Screen 3 标题「方案结果」→「方案快照」③ 快照卡片头部简化：移除品牌名称+口号+企微客服二维码，替换为醒目提示「请截图后分享给企微客服」（品牌绿 15px 加粗 + 浅黄渐变背景 + 品牌黄色边框 + 圆角 8px）④ 底部按钮交互优化：「💾 快照预览（截图保存）」→「💬 联系企微客服」，点击行为从 html2canvas 截图生成改为直接显示企微客服二维码（`showServiceQR()` 函数），二维码在图片预览弹窗中全屏查看便于长按识别 ⑤ 技术变更：plan/index.html 结构调整、plan/script.js 事件监听器更新 + 新增函数、plan/style.css 移除旧样式新增 `.snapshot-hint` 样式 |
 | 2026/09/21 | **V1.0 功能实现完成**：① 3 屏向导 UI 落地（Screen 1 基础配置 / Screen 2 口味分配 / Screen 3 方案快照）② 核心功能：宠物类型（犬默认/猫敬请期待）、订阅总数（≥30 包起订 + 包单位后缀）、免邮信息实时计算、模拟计算（可折叠、从 calories/ 回程自动展开并预填每日包数 + 默认 30 天）、一键均分（余数优先便宜口味）、实时算价 + 折扣阶梯、热量偏差校验（仅回程路径）、方案快照（html2canvas 截图保存 + 企微客服二维码）③ 按钮文案优化：下一步→「口味分配 →」「方案结果 →」，复用 calories/ 箭头图 ④ UI 打磨：展开/收起 icon 底色改为天数选项底色、猫敬请期待加深、口味单价标注、自定义时长小字、快照预览弹窗统一提示文案 ⑤ calories/ V3.23 联动完成：from=plan 条件隔离、跳过 Step 0、Step 1 上一步→返回订阅计划、Step 10 商城按钮条件替换、回程带 pet/packs/kcal 参数 |

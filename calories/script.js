@@ -1,8 +1,5 @@
 // ========== 常量配置 ==========
-const PET_CONFIG = {
-    dog: { icon: '🐶', label: '犬' },
-    cat: { icon: '🐱', label: '猫' }
-};
+// PET_CONFIG 来自 ../shared/utils.js（单一数据源）
 
 const POST_SURGERY_OPTIONS = [
     { value: 'spay', label: '绝育手术后一周内' },
@@ -118,23 +115,8 @@ const STEP_CONFIGS = {
 };
 
 // ========== 产品数据 ==========
-const PRODUCT_DATA = {
-    dog: [
-        { name: '鸡肉鳕鱼', grams: 120, kcal: 121 },
-        { name: '猪肉蓝莓', grams: 120, kcal: 149 },
-        { name: '牛肉牡蛎', grams: 120, kcal: 144 },
-        { name: '珍萃鹿肉', grams: 120, kcal: 154 },
-        { name: '鸭肉冬瓜梨', grams: 120, kcal: 130 },
-        { name: '平均数据', grams: 120, kcal: 140 }
-    ],
-    cat: [
-        { name: '鸡肉鳕鱼', grams: 80, kcal: 107 },
-        { name: '猪肉蓝莓', grams: 80, kcal: 111 },
-        { name: '嫩牛牡蛎', grams: 80, kcal: 127 },
-        { name: '野牧鹿肉', grams: 80, kcal: 132 },
-        { name: '平均数据', grams: 80, kcal: 119 }
-    ]
-};
+// PRODUCT_DATA、getFlavors()、getAvgKcal() 来自 ../shared/utils.js（单一数据源）
+// 平均数据行在 renderBrandSuggestions() 中动态计算追加
 
 const CALORIE_DEFICIT_RATIO = 0.85;
 
@@ -500,14 +482,15 @@ function showResult() {
 }
 
 function renderBrandSuggestions() {
-    const products = PRODUCT_DATA[state.petType];
+    const flavors = getFlavors(state.petType);
+    const avgKcal = getAvgKcal(state.petType);
     const adjustedMER = currentMER * CALORIE_DEFICIT_RATIO;
 
-    dom.suggestionBody.innerHTML = products.map(product => {
+    // 口味行 + 末尾追加动态计算的"平均数据"行
+    let html = flavors.map(product => {
         const packs = roundToHalf(adjustedMER / product.kcal);
-        const isAverage = product.name === '平均数据';
         return `
-            <div class="suggestion-row ${isAverage ? 'average-row' : ''}">
+            <div class="suggestion-row">
                 <span class="col-flavor">${product.name}</span>
                 <span class="col-kcal">${product.kcal} kcal</span>
                 <span class="col-grams">${product.grams}g</span>
@@ -515,6 +498,17 @@ function renderBrandSuggestions() {
             </div>
         `;
     }).join('');
+
+    const avgPacks = roundToHalf(adjustedMER / avgKcal);
+    html += `
+        <div class="suggestion-row average-row">
+            <span class="col-flavor">平均数据</span>
+            <span class="col-kcal">${Math.round(avgKcal)} kcal</span>
+            <span class="col-grams">${flavors[0].grams}g</span>
+            <span class="col-packs">${avgPacks.toFixed(1)} 包</span>
+        </div>
+    `;
+    dom.suggestionBody.innerHTML = html;
 }
 
 function updateSnapshotData() {

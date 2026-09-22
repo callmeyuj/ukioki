@@ -5,6 +5,37 @@
 
 ---
 
+## V1.2 — 2026/09/22
+
+### 跨模块架构优化（script.js 去重 + CSS 清理）
+
+**script.js（696 → 661 行，-35 行）：**
+
+单一数据源迁移：
+- 删除本地 `PRODUCT_DATA`（含未使用的 `avgKcal` 常量），改用 shared/utils.js 共享数据
+- `PRODUCT_DATA[petType].flavors` → `getFlavors(petType)`（8 处）
+- `pet === 'dog' ? '犬' : '猫'` → `PET_CONFIG[petType].label`
+
+Bug 修复：
+- 删除本地 `fmtMoney()`，改用共享 `formatMoney()`（支持千位分隔符：`¥ 1345.12` → `¥ 1,345.12`）
+
+代码去重：
+- 新增 `calcPriceSummary()` 提取公共价格计算（原价/折扣/折后/节省），`renderPrice()` 和 `renderSnapshot()` 共用，消除两处重复计算逻辑
+- 日期格式化改用共享 `formatDate()`（`init()` + `renderSnapshot()` 两处）
+
+**style.css（946 → 933 行，-13 行）：**
+
+死代码清理：
+- 删除未使用的 `.text-price` 工具类
+- 删除死代码 `.snapshot-total-right`、`.snapshot-total .text-price`（HTML 结构已不存在）
+- 删除重复 `.btn-back-link:hover` 规则（与上方完全相同）
+
+特异性补丁清理：
+- 移除 `.snapshot-price-section span.price-actual-label` 的 `span.` 前缀（根因 `.snapshot-field span:first-child` 已加 `:not()` 排除，补丁冗余）
+- 同理移除 `.snapshot-price-section span.price-original-label` 的 `span.` 前缀
+
+---
+
 ## V1.1 — 2026/09/22
 
 ### UI 优化与功能修复

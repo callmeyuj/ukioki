@@ -12,8 +12,8 @@
 
 | 模块 | 路径 | 功能 | 状态 |
 |------|------|------|------|
-| **热量计算器** | `/calories/` | 宠物每日摄入热量计算 + uki oki 鲜食喂食建议 | ✅ 已上线（V3.23，含 plan/ 回程适配） |
-| **订阅计划** | `/plan/` | 价格计算器（名义订阅）：固定包数 + 口味分配 + 折扣阶梯 → 参考预算 | ✅ V1.1 完成（页面紧凑度优化 + 包数计算黑灰淡色化 + 功能修复），待打 tag 上线 |
+| **热量计算器** | `/calories/` | 宠物每日摄入热量计算 + uki oki 鲜食喂食建议 | ✅ 已上线（V3.24，数据源迁移至 shared/utils.js） |
+| **订阅计划** | `/plan/` | 价格计算器（名义订阅）：固定包数 + 口味分配 + 折扣阶梯 → 参考预算 | ✅ V1.2 完成（千位符 bug 修复 + 跨模块去重），待打 tag 上线 |
 
 ### 技术栈
 
@@ -69,7 +69,7 @@ ukioki/
 
 | Remote | 地址 | 用途 | 当前状态 |
 |--------|------|------|----------|
-| `ukioki` | `git@github.com:callmeyuj/ukioki.git` | 品牌官网（www.ukioki.com） | V1.3（plan/ V1.0 + calories/ V3.23） |
+| `ukioki` | `git@github.com:callmeyuj/ukioki.git` | 品牌官网（www.ukioki.com） | V1.3（plan/ V1.2 + calories/ V3.24） |
 
 **部署**：腾讯云托管，域名 `www.ukioki.com` 已备案
 
@@ -77,7 +77,7 @@ ukioki/
 
 ## 当前版本
 
-**V1.3** — 2026/09/21（plan/ V1.0 订阅计划模块完成 + calories/ V3.23 联动适配）
+**V1.3** — 2026/09/22（shared/utils.js 建立单一数据源：共享 `PRODUCT_DATA`/`PET_CONFIG` + 新增 `formatMoney`/`formatDate`/`getFlavors`/`getAvgKcal`；plan/ V1.2 修复千位符 bug + 提取 `calcPriceSummary` 去重；calories/ V3.24 迁移至共享数据源，行为零变化）
 
 ---
 
@@ -85,7 +85,7 @@ ukioki/
 
 ### 热量计算器（calories/）
 
-**当前版本**：V3.23
+**当前版本**：V3.24
 **核心功能**：
 - 引导用户选择宠物信息（犬/猫）
 - 计算每日建议摄入热量（MER）
@@ -96,7 +96,7 @@ ukioki/
 
 ### 订阅计划（plan/）
 
-**当前版本**：✅ V1.0 完成（2026/09/21，3 屏向导 + 快照 + calories/ 联动，待打 tag 上线，详见 `plan/CLAUDE.md`）
+**当前版本**：✅ V1.2 完成（2026/09/22，3 屏向导 + 快照 + calories/ 联动 + 跨模块去重 + 千位符 bug 修复，待打 tag 上线，详见 `plan/CLAUDE.md`）
 **定位**：名义订阅，实质**价格计算器**（不含配送周期/订阅管理/支付）
 **核心流程**（八步）：
 - 宠物类型（第 0 步）：犬默认选中，猫置灰 +"敬请期待/即将上线"备注（无独立猫落地页）
@@ -152,13 +152,19 @@ plan/style.css          ← 订阅计划专属样式（待开发）
 - 模块专属样式可覆盖共享样式（使用更具体的选择器）
 - 加载顺序：brand.css → components.css → style.css
 
-### shared/utils.js（共享工具函数，V1.2 新增）
+### shared/utils.js（共享工具函数 + 共享数据，V1.2 新增，V1.3 扩展数据）
 
 包含：
 - 数值处理：`roundToHalf()`（取整到 0.5）、`formatPacks()`（包数格式化）
 - 环境判断：`isMobile()`（UA 判断移动设备）
 - DOM 工具：`toggleSelection()`（选项卡片选中切换）
 - 函数控制：`debounce()`（防抖，为 plan/ 输入场景备用）
+- 格式化工具（V1.3 新增）：`formatMoney(v)`（千位分隔金额）、`formatDate(date)`（YYYY/MM/DD）
+- 共享数据（V1.3 新增，建立单一数据源）：
+  - `PRODUCT_DATA`（Object.freeze）：犬猫口味列表，含 id/name/grams/kcal/price
+  - `PET_CONFIG`（Object.freeze）：宠物 icon/label
+  - `getFlavors(petType)`：获取口味列表
+  - `getAvgKcal(petType)`：动态计算平均单包热量（无需维护单独常量）
 
 **JS 加载方式**（普通 script + defer，无构建工具）：
 ```html
@@ -184,7 +190,7 @@ plan/style.css          ← 订阅计划专属样式（待开发）
 
 | 优先级 | 功能 | 状态 | 说明 |
 |--------|------|------|------|
-| **P0** | 订阅计划（plan/） | ✅ V1.1 完成，待打 tag 上线 | 价格计算器：固定包数 + 口味分配 + 折扣阶梯 → 参考预算（详见 plan/CLAUDE.md） |
+| **P0** | 订阅计划（plan/） | ✅ V1.2 完成，待打 tag 上线 | 价格计算器：固定包数 + 口味分配 + 折扣阶梯 → 参考预算（详见 plan/CLAUDE.md） |
 | **P1** | 官网主页 | 📋 待规划 | 根目录 index.html，衔接各模块入口 |
 | **P2** | 用户登录系统 | 📋 待规划 | 微信登录 + 手机号登录 |
 | **P3** | 微信小程序集成 | ❓ 待评估 | 继承登录态和数据（技术可行性待评估） |
@@ -238,6 +244,7 @@ plan/style.css          ← 订阅计划专属样式（待开发）
 
 | 时间 | 内容 |
 |------|------|
+| 2026/09/22 | **品牌 V1.3 跨模块架构优化**：① shared/utils.js（43→98 行）新增 `PRODUCT_DATA`/`PET_CONFIG`（Object.freeze 单一数据源）、`getFlavors(petType)`/`getAvgKcal(petType)`（动态算均值，无需维护单独常量）、`formatMoney(v)`（千位分隔符）、`formatDate(date)` ② plan/ V1.1→V1.2：删除本地 `PRODUCT_DATA`，改用共享数据（8 处）；新增 `calcPriceSummary()` 消除 renderPrice/renderSnapshot 重复计算；`fmtMoney` 改用共享 `formatMoney`（修复千位符 bug）；`formatDate` 替换 2 处重复日期格式化；CSS 死代码清理（`.text-price`/`.snapshot-total-right`/重复 hover 规则）+ 特异性补丁清理 ③ calories/ V3.23→V3.24：删除本地 `PET_CONFIG`/`PRODUCT_DATA`（含平均行）；`renderBrandSuggestions()` 改用 `getFlavors()` + 动态追加平均行（`getAvgKcal()`）；行为零变化 |
 | 2026/09/21 | **plan/ V1.0 完成**：3 屏向导式价格计算器落地（Screen 1 基础配置 + 模拟计算 / Screen 2 口味分配 + 实时算价 / Screen 3 方案快照 + html2canvas 截图保存）；核心功能：订阅总数（≥30 包起订 + 包单位）、免邮实时计算、一键均分（余数优先便宜口味）、折扣阶梯、热量偏差校验（仅回程）、方案快照（企微客服二维码）；按钮文案优化（口味分配 → / 方案结果 →）+ 复用 calories/ 箭头图；UI 打磨（折叠 icon 柔和底色、猫敬请期待加深、口味单价、自定义时长小字、弹窗统一提示）；calories/ V3.23 联动完成（from=plan 条件隔离、跳过 Step 0、Step 1 返回订阅计划、Step 10 商城替换、回程带参数） |
 | 2026/09/21 | **calories/ V3.23 plan/ 回程入口适配**：条件隔离（`from=plan` URL 参数），跳过 Step 0 锁定犬型，Step 10 商城按钮条件替换为「↩ 返回订阅计划」（带 pet/packs/kcal 回跳参数）。正常入口零感知。涉及 script.js（~25 行新增）+ index.html（1 按钮新增） |
 | 2026/09/16 | **会话结束总结**——已完成：plan/ **需求定义阶段收官**（决策 #21~#31 共 11 项新增 + 6 项修订：运费规则/免邮公式、输出形态快照化、calories/ 联动机制（正向不引流 + 条件回程按钮替换 + 跳过犬猫选择）、宠物类型区分（犬默认/猫置灰）、免邮文案口径；否决 .py 后端与独立计算页路线并归档理由）。3 个 commit 已推送（6a712b6 / 09c8039 / 73191cd）。待办：① 阶段 2 方案设计（页面流程图、PLAN_RULES 计算设计、快照版式、calories/ 改动影响评估 + 回归测试、Plan 模式评审）② 预留观察项：配送次数输入环节可能废除（可拆卸设计） |

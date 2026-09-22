@@ -116,15 +116,15 @@
             </div>
 
             <div class="price-panel">
-                <div class="price-row">
-                    <span class="price-original" id="priceOriginal">¥ 0.00</span>
+                <div class="price-row price-main">
+                    <span class="price-actual-label">实付</span>
+                    <span class="price-actual-value" id="priceValue">¥ 0.00</span>
+                    <span class="price-original-label">优惠前</span>
+                    <span class="price-original-value" id="priceOriginal">¥ 0.00</span>
                 </div>
-                <div class="price-row">
-                    <span class="price-current">💰 参考预算</span>
-                    <div class="price-current-right">
-                        <span class="price-value" id="priceValue">¥ 0.00</span>
-                        <span class="price-rate" id="priceRate"></span>
-                    </div>
+                <div class="price-row price-savings-row">
+                    <span class="price-savings-tag" id="priceSavings">共减 ¥ 0.00</span>
+                    <span class="price-rate" id="priceRate"></span>
                 </div>
             </div>
 
@@ -135,7 +135,7 @@
             </div>
 
             <div class="btn-row">
-                <button class="btn btn-next" id="btnNext2" disabled>方案快照</button>
+                <button class="btn btn-next" id="btnNext2" disabled>查看方案</button>
             </div>
         </div>
 
@@ -143,13 +143,13 @@
         <div class="step" id="step-3">
             <div class="step-header">
                 <button class="btn-back-link" id="btnBack3">&lt;</button>
-                <div class="step-title">方案快照</div>
+                <div class="step-title">订阅方案</div>
             </div>
 
             <!-- 快照卡片（Screen 3 可见版） -->
             <div class="snapshot-preview" id="snapshotPreview">
                 <div class="snapshot-header">
-                    <div class="snapshot-hint">请截图后分享给企微客服</div>
+                    <div class="snapshot-hint">请截图分享给企微客服</div>
                 </div>
                 <div class="snapshot-section">
                     <div class="snapshot-section-title">── 方案明细 ──</div>
@@ -159,10 +159,15 @@
                     <div id="snapFlavorList"></div>
                 </div>
                 <div class="snapshot-section snapshot-price-section">
-                    <div class="snapshot-field"><span class="text-strike" id="snapOriginalPrice">¥ 0.00</span></div>
-                    <div class="snapshot-field snapshot-total">
-                        <span>折后总价 <span class="snap-discount-tag" id="snapDiscount"></span></span>
+                    <div class="snapshot-field price-main">
+                        <span class="price-actual-label">实付</span>
                         <span class="text-price" id="snapTotalPrice">¥ 0.00</span>
+                        <span class="price-original-label">优惠前</span>
+                        <span class="text-strike" id="snapOriginalPrice">¥ 0.00</span>
+                    </div>
+                    <div class="snapshot-field snapshot-total">
+                        <span class="price-savings-tag" id="snapSavings">共减 ¥ 0.00</span>
+                        <span class="snap-discount-tag" id="snapDiscount"></span>
                     </div>
                 </div>
                 <div class="snapshot-footer">

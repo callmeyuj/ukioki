@@ -4,6 +4,48 @@
 
 ---
 
+## V1.3 — 2026/09/22
+
+### 跨模块架构优化（单一数据源 + 共享工具扩展）
+
+**shared/utils.js（43 → 98 行，+55 行）新增 6 项共享资产：**
+
+共享数据（建立单一数据源，消除 plan/ 和 calories/ 两份重复产品数据）：
+- `PRODUCT_DATA`（Object.freeze）：犬猫口味列表，含 id/name/grams/kcal/price，猫价格暂为 null
+- `PET_CONFIG`（Object.freeze）：宠物 icon/label（`{ dog: { icon: '🐶', label: '犬' }, ... }`）
+- `getFlavors(petType)`：访问接口，封装数据结构
+- `getAvgKcal(petType)`：动态算平均热量，口味增减时自动同步，无需维护单独常量
+
+共享工具函数：
+- `formatMoney(v)`：金额格式化，支持千位分隔符（`¥ 1,345.12`），修复 plan/ 原 `fmtMoney` 不支持千位符的缺陷
+- `formatDate(date)`：日期格式化（`YYYY/MM/DD`），消除两个模块里的重复实现
+
+**模块侧连锁更新：**
+
+plan/script.js（-35 行）：
+- 删除本地 `PRODUCT_DATA`（含未使用的 `avgKcal` 常量）
+- `PRODUCT_DATA[petType].flavors` → `getFlavors(petType)`（8 处）
+- `fmtMoney()` 本地定义删除，改用共享 `formatMoney()`（**修复千位符 bug**）
+- 新增 `calcPriceSummary()` 提取公共价格计算，`renderPrice()` 和 `renderSnapshot()` 复用
+- 日期格式化改用 `formatDate()`（2 处：`init()` + `renderSnapshot()`）
+- `pet === 'dog' ? '犬' : '猫'` → `PET_CONFIG[petType].label`
+
+calories/script.js（-6 行）：
+- 删除本地 `PET_CONFIG` 和 `PRODUCT_DATA`（含平均行）
+- `renderBrandSuggestions()` 改用 `getFlavors()` + 动态追加平均行（`getAvgKcal()`）
+- 平均行 kcal 从硬编码 140/119 改为动态计算（`Math.round(139.6)` = 140，行为不变）
+
+plan/style.css（-13 行）：
+- 删除死代码：`.text-price`、`.snapshot-total-right`、`.snapshot-total .text-price`
+- 删除重复 `.btn-back-link:hover` 规则
+- 移除 `.snapshot-price-section span.price-actual-label` 等特异性补丁（根因 `:not()` 选择器已修，补丁冗余）
+
+**版本影响：**
+- plan/ V1.1 → V1.2（含 bug 修复 + 重构）
+- calories/ V3.23 → V3.24（数据源迁移，行为零变化）
+
+---
+
 ## V1.2 — 2026/09/08
 
 ### 共享 JS 工具提取（V1.1 CSS 提取的 JS 侧对应操作）
@@ -103,8 +145,8 @@
 
 | 模块 | 当前版本 | 最后更新 | CHANGELOG 位置 |
 |------|----------|----------|----------------|
-| 热量计算器 | V3.22 | 2026/09/01 | `calories/CHANGELOG.md` |
-| 订阅计划 | — | — | `plan/CHANGELOG.md`（待创建） |
-| 品牌官网 | V1.2 | 2026/09/08 | 本文件 |
+| 热量计算器 | V3.24 | 2026/09/22 | `calories/CHANGELOG.md` |
+| 订阅计划 | V1.2 | 2026/09/22 | `plan/CHANGELOG.md` |
+| 品牌官网 | V1.3 | 2026/09/22 | 本文件 |
 
 ---

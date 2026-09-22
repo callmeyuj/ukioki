@@ -15,20 +15,7 @@ const PLAN_RULES = {
     calorieDeviationThreshold: 0.2   // 热量偏差 > 20% 时提示
 };
 
-/** 产品数据（犬 V1；猫预留 null） */
-const PRODUCT_DATA = {
-    dog: {
-        flavors: [
-            { id: 'chicken_cod',    name: '鸡肉鳕鱼',   grams: 120, kcal: 121, price: 18.8 },
-            { id: 'pork_blueberry', name: '猪肉蓝莓',   grams: 120, kcal: 149, price: 22.8 },
-            { id: 'beef_oyster',    name: '牛肉牡蛎',   grams: 120, kcal: 144, price: 25.8 },
-            { id: 'venison',        name: '珍萃鹿肉',   grams: 120, kcal: 154, price: 29.8 },
-            { id: 'duck_winter',    name: '鸭肉冬瓜梨', grams: 120, kcal: 130, price: 19.8 }
-        ],
-        avgKcal: 140
-    },
-    cat: null   // V2 扩展
-};
+// 产品数据、PET_CONFIG、getFlavors()、getAvgKcal() 均来自 ../shared/utils.js（单一数据源）
 
 /* ========== 状态 ========== */
 
@@ -82,6 +69,7 @@ function cacheDom() {
     els.priceOriginal    = document.getElementById('priceOriginal');
     els.priceValue       = document.getElementById('priceValue');
     els.priceRate        = document.getElementById('priceRate');
+    els.priceSavings     = document.getElementById('priceSavings');
     els.calorieDeviation = document.getElementById('calorieDeviation');
     els.deviationText    = document.getElementById('deviationText');
     els.btnNext2         = document.getElementById('btnNext2');
@@ -96,6 +84,7 @@ function cacheDom() {
     els.snapFlavorList   = document.getElementById('snapFlavorList');
     els.snapOriginalPrice = document.getElementById('snapOriginalPrice');
     els.snapTotalPrice   = document.getElementById('snapTotalPrice');
+    els.snapSavings      = document.getElementById('snapSavings');
     els.snapDate         = document.getElementById('snapDate');
     els.btnContactService = document.getElementById('btnContactService');
     els.btnRestart       = document.getElementById('btnRestart');
@@ -108,10 +97,7 @@ function cacheDom() {
 }
 
 /* ========== 工具函数 ========== */
-
-function fmtMoney(v) {
-    return '¥ ' + v.toFixed(2);
-}
+// formatMoney() 来自 ../shared/utils.js（含千位分隔符）
 
 /** 折扣率 → "X折"（0.85 → "8.5折"，0.80 → "8折"） */
 function fmtDiscount(rate) {
@@ -231,7 +217,7 @@ function renderSimulate() {
 
 /** Screen 2：口味列表（含 [− X +] 控件） */
 function renderFlavors() {
-    const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
+    const flavors = getFlavors(state.subscription.petType);
     const totalPacks = state.subscription.packs;
 
     // 初始化分配（缺失的口味补 0）
@@ -265,7 +251,7 @@ function renderFlavors() {
 
 /** Screen 2：分配汇总 + 价格面板 */
 function renderAllocate() {
-    const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
+    const flavors = getFlavors(state.subscription.petType);
     const totalPacks = state.subscription.packs;
     const allocated = sumAllocation(state.allocation);
 
@@ -287,24 +273,25 @@ function renderAllocate() {
     renderPrice();
 }
 
-/** Screen 2：价格面板（原价 / 折后价 / 折扣率） */
-function renderPrice() {
-    const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
+/** 计算价格汇总（原价 / 折扣率 / 折后价 / 节省金额），renderPrice 和 renderSnapshot 共用 */
+function calcPriceSummary() {
+    const flavors = getFlavors(state.subscription.petType);
     const totalPacks = state.subscription.packs;
-
     const originalPrice = calcOriginalPrice(state.allocation, flavors);
     const tier = getDiscountTier(totalPacks, PLAN_RULES.tiers);
     const rate = tier ? tier.rate : 1;
     const discountedPrice = originalPrice * rate;
+    return { originalPrice, tier, rate, discountedPrice, savings: originalPrice - discountedPrice };
+}
 
-    els.priceOriginal.textContent = fmtMoney(originalPrice);
-    els.priceValue.textContent = fmtMoney(discountedPrice);
+/** Screen 2：价格面板（实付 / 优惠前 / 共减 / 折扣率） */
+function renderPrice() {
+    const { originalPrice, tier, rate, discountedPrice, savings } = calcPriceSummary();
 
-    if (tier && rate < 1) {
-        els.priceRate.textContent = fmtDiscount(rate);
-    } else {
-        els.priceRate.textContent = '';
-    }
+    els.priceOriginal.textContent = formatMoney(originalPrice);
+    els.priceValue.textContent = formatMoney(discountedPrice);
+    els.priceSavings.textContent = '共减 ' + formatMoney(savings);
+    els.priceRate.textContent = (tier && rate < 1) ? fmtDiscount(rate) : '';
 }
 
 /** Screen 2：热量偏差提示（仅回程路径触发） */
@@ -324,7 +311,7 @@ function renderCalorieDeviation() {
         return;
     }
 
-    const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
+    const flavors = getFlavors(state.subscription.petType);
     const totalKcal = calcTotalKcal(state.allocation, flavors);
     const dailyKcal = totalKcal / days;  // 日均摄入
     const targetKcal = state.returnContext.targetKcal;  // 每日推荐
@@ -345,24 +332,15 @@ function renderCalorieDeviation() {
 
 /** Screen 3：快照卡片数据填充 */
 function renderSnapshot() {
-    const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
-    const petLabel = state.subscription.petType === 'dog' ? '犬' : '猫';
-    const totalPacks = state.subscription.packs;
-    const tier = getDiscountTier(totalPacks, PLAN_RULES.tiers);
-    const rate = tier ? tier.rate : 1;
-    const originalPrice = calcOriginalPrice(state.allocation, flavors);
-    const discountedPrice = originalPrice * rate;
+    const flavors = getFlavors(state.subscription.petType);
+    const { originalPrice, tier, rate, discountedPrice } = calcPriceSummary();
 
-    els.snapPet.textContent = petLabel;
-    els.snapPacks.textContent = totalPacks + ' 包';
-    if (tier) {
-        els.snapDiscount.textContent = fmtDiscount(rate);
-        els.snapDiscount.style.display = '';
-    } else {
-        els.snapDiscount.style.display = 'none';
-    }
+    els.snapPet.textContent = PET_CONFIG[state.subscription.petType].label;
+    els.snapPacks.textContent = state.subscription.packs + ' 包';
+    els.snapDiscount.textContent = tier ? fmtDiscount(rate) : '';
+    els.snapDiscount.style.display = tier ? '' : 'none';
 
-    // 口味分配
+    // 口味分配（仅显示 count > 0 的口味）
     let flavorHtml = '';
     for (const f of flavors) {
         const count = state.allocation[f.id] || 0;
@@ -372,15 +350,10 @@ function renderSnapshot() {
     }
     els.snapFlavorList.innerHTML = flavorHtml;
 
-    els.snapOriginalPrice.textContent = fmtMoney(originalPrice);
-    els.snapTotalPrice.textContent = fmtMoney(discountedPrice);
-
-    // 生成日期
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    els.snapDate.textContent = y + '/' + m + '/' + d;
+    els.snapOriginalPrice.textContent = formatMoney(originalPrice);
+    els.snapTotalPrice.textContent = formatMoney(discountedPrice);
+    els.snapSavings.textContent = '共减 ' + formatMoney(originalPrice - discountedPrice);
+    els.snapDate.textContent = formatDate();
 }
 
 /* ========== 屏幕切换 ========== */
@@ -409,7 +382,7 @@ function showScreen(n) {
 
 /** 均分 */
 function doEvenSplit() {
-    const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
+    const flavors = getFlavors(state.subscription.petType);
     state.allocation = calcEvenSplit(state.subscription.packs, flavors);
     renderAllocate();
     renderCalorieDeviation();
@@ -417,7 +390,7 @@ function doEvenSplit() {
 
 /** 清零 */
 function doClearAll() {
-    const flavors = PRODUCT_DATA[state.subscription.petType].flavors;
+    const flavors = getFlavors(state.subscription.petType);
     for (const f of flavors) state.allocation[f.id] = 0;
     renderAllocate();
     renderCalorieDeviation();
@@ -678,11 +651,8 @@ function init() {
     parseUrlParams();
     bindEvents();
 
-    // 默认日期
-    const now = new Date();
-    els.snapDate.textContent = now.getFullYear() + '/' +
-        String(now.getMonth() + 1).padStart(2, '0') + '/' +
-        String(now.getDate()).padStart(2, '0');
+    // 默认日期（快照生成日期，renderSnapshot 时也会刷新）
+    els.snapDate.textContent = formatDate();
 
     // 初始渲染
     showScreen(1);

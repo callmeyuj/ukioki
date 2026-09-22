@@ -2,6 +2,26 @@
 
 ---
 
+## V3.24 — 2026/09/22
+
+### 跨模块架构优化（单一数据源迁移）
+
+**script.js（803 → 797 行，-6 行）：**
+
+单一数据源迁移：
+- 删除本地 `PET_CONFIG`（已提取至 shared/utils.js）
+- 删除本地 `PRODUCT_DATA`（含"平均数据"行，已提取至 shared/utils.js）
+- `getPetConfig()` 改读共享 `PET_CONFIG`（行为不变）
+
+`renderBrandSuggestions()` 重构：
+- 口味行：`PRODUCT_DATA[state.petType]` → `getFlavors(state.petType)`（结构相同，数据来源改为共享）
+- 平均行：改为动态追加（`getAvgKcal(state.petType)` 计算），不再依赖 PRODUCT_DATA 中的"平均数据"行
+- 平均 kcal 从硬编码（140/119）改为动态计算（`Math.round(139.6)` = 140 / `Math.round(119.25)` = 119，显示不变）
+
+**行为零变化**：所有喂食量包数、快照数据、系数推导链完全不变
+
+---
+
 ## V3.23 — 2026/09/21
 
 ### plan/ 回程入口适配

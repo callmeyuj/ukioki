@@ -12,7 +12,6 @@
 .hidden { display: none !important; }
 .required { color: #e74c3c; }
 .text-strike { text-decoration: line-through; color: #999; }
-.text-price { color: var(--brand-green); font-weight: 700; }
 .text-bold { font-weight: 700; }
 
 /* 页面主标题（Screen 1） */
@@ -48,6 +47,12 @@
     font-weight: 400;
 }
 
+/* 订阅总数输入框 placeholder 缩小变淡 */
+#section-packs .input.input-normal::placeholder {
+    font-size: 12px;
+    color: #999;
+}
+
 /* 小尺寸（模拟区用） */
 .input.input-sm {
     font-size: 14px;
@@ -65,7 +70,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
 }
 
 .step-header .step-title {
@@ -96,8 +101,6 @@
 .btn-back-link:hover {
     color: var(--brand-dark);
 }
-
-.btn-back-link:hover { color: var(--brand-dark); }
 
 /* 下一步按钮箭头（复用 calories/ 箭头图） */
 .btn-next::after {
@@ -401,7 +404,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     gap: 10px;
 }
 
@@ -450,16 +453,16 @@
 .flavor-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 7px;
 }
 
 .flavor-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 14px;
+    padding: 9px 12px;
     background: var(--bg-cream);
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid var(--border-light);
 }
 
@@ -483,17 +486,17 @@
 .flavor-controls {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 7px;
 }
 
 .flavor-controls .btn-minus,
 .flavor-controls .btn-plus {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 1.5px solid var(--border-light);
     background: #fff;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -523,11 +526,11 @@
 }
 
 .flavor-controls .flavor-input {
-    width: 48px;
+    width: 40px;
     text-align: center;
     border: 1.5px solid var(--border-light);
     border-radius: 8px;
-    padding: 5px 6px;
+    padding: 4px 4px;
     font-size: 14px;
     font-weight: 600;
     color: var(--brand-dark);
@@ -543,53 +546,85 @@
 
 /* ========== 价格面板 ========== */
 .price-panel {
-    margin-top: 16px;
-    padding: 16px 18px;
+    margin-top: 12px;
+    padding: 12px 14px;
     border: 2px dashed var(--brand-yellow);
-    border-radius: 14px;
+    border-radius: 12px;
     background: rgba(224, 231, 33, 0.06);
 }
 
 .price-row {
     display: flex;
-    justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
 }
 
 .price-row:last-child { margin-bottom: 0; }
 
-.price-original {
+.price-main {
+    gap: 6px;
+}
+
+/* 实付标签 */
+.price-actual-label {
     font-size: 14px;
-    color: #999;
-    text-decoration: line-through;
+    color: var(--brand-green-light);
+    font-weight: 700;
 }
 
-.price-current {
-    font-size: 14px;
-    color: var(--text-gray);
-    font-weight: 500;
-}
-
-.price-current-right {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-}
-
-.price-value {
+/* 实付价格（主视觉） */
+.price-actual-value {
     font-size: 26px;
     font-weight: 700;
     color: var(--brand-green);
 }
 
-.price-rate {
-    font-size: 13px;
-    color: var(--brand-green);
+/* 分隔符 */
+.price-separator {
+    font-size: 14px;
+    color: #ddd;
+    margin: 0 4px;
+}
+
+/* 优惠前标签 */
+.price-original-label {
+    font-size: 14px;
+    color: #999;
     font-weight: 600;
-    background: rgba(74, 106, 29, 0.1);
+}
+
+/* 优惠前价格（划线） */
+.price-original-value {
+    font-size: 18px;
+    color: #999;
+    font-weight: 700;
+    text-decoration: line-through;
+}
+
+/* 共减标签（暖黄底 + 品牌绿字） */
+.price-savings-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--brand-green);
+    background: rgba(229, 246, 20, 0.18);
     padding: 2px 8px;
-    border-radius: 6px;
+    border-radius: 4px;
+}
+
+/* 折扣标签 */
+.price-rate {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--brand-green);
+    background: rgba(229, 246, 20, 0.18);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* 共减行 */
+.price-savings-row {
+    gap: 6px;
 }
 
 /* ========== 热量偏差提示 ========== */
@@ -670,7 +705,7 @@
     color: var(--brand-dark);
 }
 
-.snapshot-field span:first-child {
+.snapshot-field span:first-child:not(.price-actual-label):not(.price-savings-tag) {
     color: var(--text-gray);
 }
 
@@ -680,16 +715,69 @@
     border-top: 1px solid var(--border-light);
 }
 
-.snapshot-total .text-price {
-    font-size: 18px;
+/* 快照价格区：字号/字重/颜色完全对齐 Screen 2 */
+.snapshot-price-section .price-main {
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.snapshot-price-section .snapshot-total {
+    justify-content: flex-start;
+    gap: 8px;
+    border-top: none;
+    padding-top: 2px;
+    margin-top: 2px;
+}
+
+/* 快照价格区标签（.snapshot-field span:first-child 的 :not() 已排除这两个类，无需再加特异性） */
+.snapshot-price-section .price-actual-label {
+    font-size: 12px;
+    color: var(--brand-green-light);
+    font-weight: 700;
+}
+
+.snapshot-price-section .text-price {
+    font-size: 20px;
+    color: var(--brand-green);
+    font-weight: 700;
+}
+
+.snapshot-price-section .price-separator {
+    font-size: 12px;
+    color: #ddd;
+}
+
+.snapshot-price-section .price-original-label {
+    font-size: 12px;
+    color: #999;
+    font-weight: 600;
+}
+
+.snapshot-price-section .text-strike {
+    font-size: 14px;
+    color: #999;
+    font-weight: 700;
+    text-decoration: line-through;
+}
+
+/* 快照中共减/折扣标签与 Screen 2 完全一致 */
+.snapshot-price-section .price-savings-tag,
+.snapshot-price-section .snap-discount-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand-green);
+    background: rgba(229, 246, 20, 0.18);
+    padding: 2px 8px;
+    border-radius: 4px;
 }
 
 .snap-discount-tag {
     font-size: 11px;
     font-weight: 600;
-    color: #e53935;
-    background: rgba(229, 57, 53, 0.1);
-    padding: 1px 6px;
+    color: var(--brand-green);
+    background: rgba(229, 246, 20, 0.18);
+    padding: 2px 8px;
     border-radius: 4px;
 }
 
@@ -783,7 +871,12 @@
 
 /* ========== 容器内边距 ========== */
 .container {
-    padding: 28px 24px 32px;
+    padding: 22px 24px 20px;
+}
+
+/* 覆盖共享 .btn-row 的 28px margin-top，Screen 2 紧凑化 */
+.btn-row {
+    margin-top: 14px;
 }
 
 /* ========== 移动端适配 ========== */
@@ -810,22 +903,22 @@
     }
 
     .flavor-item {
-        padding: 10px 12px;
+        padding: 7px 10px;
     }
 
     .flavor-controls .btn-minus,
     .flavor-controls .btn-plus {
-        width: 26px;
-        height: 26px;
-        font-size: 14px;
-    }
-
-    .flavor-controls .flavor-input {
-        width: 40px;
+        width: 24px;
+        height: 24px;
         font-size: 13px;
     }
 
-    .price-value {
+    .flavor-controls .flavor-input {
+        width: 36px;
+        font-size: 13px;
+    }
+
+    .price-actual-value {
         font-size: 20px;
     }
 

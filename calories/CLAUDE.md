@@ -31,7 +31,7 @@
 
 外部依赖：
 - `html2canvas` (v1.4.1) — 快照截图功能，通过 CDN 引入
-- `../shared/utils.js` — 共享工具函数（roundToHalf / formatPacks / isMobile / toggleSelection / debounce），品牌 V1.2 起引入，需在 script.js 之前加载
+- `../shared/utils.js` — 共享工具函数 + 共享数据（V1.3 扩展）：工具函数（roundToHalf / formatPacks / isMobile / toggleSelection / debounce / formatMoney / formatDate）+ 数据（PRODUCT_DATA / PET_CONFIG / getFlavors / getAvgKcal），需在 script.js 之前加载
 
 ---
 
@@ -109,9 +109,9 @@ Step 0: 宠物类型 → Step 1: 体重 → Step 2: 性别 → Step 3: 绝育
 
 | 模块 | 行号范围 | 关键函数/常量 |
 |------|----------|---------------|
-| 常量配置 | 1-12 | `PET_CONFIG`, `POST_SURGERY_OPTIONS` |
-| 步骤配置 | 13-119 | `STEP_CONFIGS`（步骤 4-8 配置） |
-| 产品数据 | 120-140 | `PRODUCT_DATA`, `CALORIE_DEFICIT_RATIO` |
+| 常量配置 | 1-10 | `POST_SURGERY_OPTIONS`（`PET_CONFIG` 已迁至 shared/utils.js） |
+| 步骤配置 | 11-117 | `STEP_CONFIGS`（步骤 4-8 配置） |
+| 产品数据 | 118-120 | `CALORIE_DEFICIT_RATIO`（`PRODUCT_DATA` 已迁至 shared/utils.js，平均行动态计算） |
 | 状态管理 | 141-151 | `INITIAL_STATE`, `state`, `currentStep`, `currentMER` |
 | DOM 缓存 | 152-173 | `dom`, `cacheElements()` |
 | 工具函数 | 174-178 | `getPetConfig()`（通用工具已提取至 `../shared/utils.js`） |
@@ -290,7 +290,7 @@ const STEP_CONFIGS = {
 | `origin` | `git@github.com:callmeyuj/pet-calories-calculator.git` | 生产环境，稳定版 | V3.22 |
 | `test-repo` | `git@github.com:callmeyuj/test-pet-calories-calculator.git` | 测试环境 | V3.22 |
 
-**本地状态**：V3.23（新增 from=plan 回程入口，待部署）
+**本地状态**：V3.24（数据源迁移至 shared/utils.js，待部署）
 
 同时推送两个 remote：
 ```bash
@@ -301,7 +301,7 @@ git push origin main && git push test-repo main
 
 ## 当前版本
 
-**V3.23** — 2026/09/21（plan/ 回程入口适配：条件隔离，正常入口零感知）
+**V3.24** — 2026/09/22（跨模块架构优化：`PRODUCT_DATA`/`PET_CONFIG` 迁至 shared/utils.js 单一数据源；`renderBrandSuggestions()` 改用 `getFlavors()` + 动态追加平均行（`getAvgKcal()`）；行为零变化）
 
 ---
 
@@ -318,6 +318,7 @@ git push origin main && git push test-repo main
 
 | 时间 | 内容 |
 |------|------|
+| 2026/09/22 | **V3.24 跨模块架构优化**：script.js（803→797 行，-6 行）——删除本地 `PET_CONFIG`（迁至 shared/utils.js）；删除本地 `PRODUCT_DATA`（含平均行，迁至 shared/utils.js）；`renderBrandSuggestions()` 改用共享 `getFlavors(state.petType)` 获取口味列表，平均行改为动态追加（`getAvgKcal(state.petType)` 计算）；平均 kcal 从硬编码 140/119 改为动态计算（`Math.round(139.6)` = 140 / `Math.round(119.25)` = 119，显示不变）；行为零变化 |
 | 2026/09/21 | **V3.23 plan/ 回程入口适配**：条件隔离（`from=plan` URL 参数），跳过 Step 0 锁定犬，Step 10 商城按钮条件替换为「↩ 返回订阅计划」，返回时带 `pet/packs/kcal` 参数跳回 plan/。正常入口零感知 |
 | 2026/09/08 | 文档架构调整：删除模块内 harness.md，迭代规范统一到品牌级根 harness.md（纯文档变更，模块版本保持 V3.22） |
 | 2026/09/08 | 品牌 V1.2：通用工具函数（roundToHalf/formatPacks/isMobile/toggleSelection）提取至 shared/utils.js，script.js 774→758 行，调用点零改动，模块版本保持 V3.22 |
